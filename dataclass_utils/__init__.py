@@ -1,3 +1,4 @@
+from dataclass_utils.error import type_error
 import dataclass_utils.type_checker as type_checker
 import dataclasses
 from typing import Any, Dict, Generic, List, Protocol, Type, TypeVar
@@ -15,9 +16,15 @@ class _runtime_typecheck_inner(Generic[T]):
 
     def __call__(self, *args, **kwargs) -> T:
         for arg, field in zip(args, self.fields):
-            type_checker.check(arg, field.type)
+            err = type_checker.check(arg, field.type)
+            if err is not None:
+                raise type_error(err)
+
         for k, v in kwargs.items():
-            type_checker.check(v, self.fields_dict[k].type)
+            err = type_checker.check(v, self.fields_dict[k].type)
+            if err is not None:
+                raise type_error(err)
+
         ret = self.ty(*args, **kwargs)  # type: ignore
         return ret
 
@@ -43,9 +50,9 @@ def runtime_typecheck(ty: Type[T]) -> Type[T]:
     >>> foo = Foo(1, ["a"])  # ok
     >>> assert isinstance(foo, Foo) # Still, it is an instance of `Foo`
     >>> import pytest
-    >>> with pytest.raises(AssertionError):
+    >>> with pytest.raises(TypeError):
     ...     Foo("a", [])
-    >>> with pytest.raises(AssertionError):
+    >>> with pytest.raises(TypeError):
     ...     Foo(1, [1, 2])
     """
     return _runtime_typecheck_inner(ty)  # type: ignore
