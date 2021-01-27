@@ -1,5 +1,5 @@
 import pytest
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, FrozenSet, List, Optional, Set, Tuple, Union
 from dataclass_utils import check_type, runtime_typecheck
 import dataclasses
 
@@ -13,6 +13,7 @@ class A:
     d: Union[int, str, None] = None
     e: Optional[int] = None
     tup: Tuple[int, str] = (1, "foo")
+    opt: Optional[FrozenSet[str]] = None
 
 
 @runtime_typecheck
@@ -91,3 +92,8 @@ def test_union():
 def test_tuple():
     with pytest.raises(TypeError):
         A(1, [], tup=(1, 1))
+
+
+def test_optional():
+    with pytest.raises(TypeError):
+        A(1, [], opt=frozenset([1]))

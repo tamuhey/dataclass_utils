@@ -12,6 +12,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    Optional,
 )
 
 Result = Optional[Error]  # returns error context
@@ -75,7 +76,7 @@ def check_tuple(value: Any, ty: Type[Tuple]) -> Result:
 def check_union(value: Any, ty) -> Result:
     if any(not is_error(check(value, t)) for t in ty.__args__):
         return None
-    return (ty, value)
+    return (value, ty)
 
 
 def check_mono_container(
