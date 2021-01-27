@@ -1,7 +1,11 @@
-from typing import Set
+from typing import Callable, Set
 import pytest
-import dataclass_utils.type_checker as type_checker
+from dataclass_utils.type_checker import is_error, check
 
 
 def test_set():
-    assert type_checker.is_error(type_checker.check({"foo", "bar", 1}, Set[str]))
+    assert is_error(check({"foo", "bar", 1}, Set[str]))
+
+
+def test_callable():
+    assert is_error(check(1, Callable))
