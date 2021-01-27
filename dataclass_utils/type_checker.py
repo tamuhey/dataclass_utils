@@ -1,3 +1,4 @@
+from dataclass_utils.error import Error
 from typing import (
     Any,
     Dict,
@@ -11,27 +12,43 @@ from typing import (
     Union,
 )
 
-Result = Optional[Tuple[Any, Type]]  # returns error context
+Result = Optional[Error]  # returns error context
 
 
 def check(value: Any, ty: Type) -> Result:
+    """
+
+    # Examples
+
+    >>> assert is_error(check(1, str))
+    >>> assert not is_error(check(1, int))
+    >>> assert is_error(check(1, list))
+    >>> assert is_error(check(1.3, int))
+    >>> assert is_error(check(1.3, Union[str, int]))
+    """
     if isinstance(ty, type):
         if not isinstance(value, ty):
             return value, ty
 
     if hasattr(ty, "__origin__"):  # generics
         to = ty.__origin__
-        check(value, to)
-        if to in {list, set, frozenset}:
-            check_mono_container(value, ty)
+        err = check(value, to)
+        if is_error(err):
+            return err
+
+        if to is list or to is set or to is frozenset:
+            err = check_mono_container(value, ty)
         elif to is dict:
-            check_dict(value, ty)
+            err = check_dict(value, ty)
         elif to is Union:
-            check_union(value, ty)
+            err = check_union(value, ty)
+
+        if is_error(err):
+            return err
 
 
-def check_union(value: Any, ty: Type[Union]) -> Result:
-    if any(check(value, t) for t in ty.__args__):
+def check_union(value: Any, ty) -> Result:
+    if any(not is_error(check(value, t)) for t in ty.__args__):
         return None
     return (ty, value)
 

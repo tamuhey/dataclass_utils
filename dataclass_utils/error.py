@@ -1,5 +1,9 @@
-from typing import Any, Type
+from typing import Any, Tuple, Type
 
 
-def type_error(expected: Type, value: Any):
+Error = Tuple[Any, Type]
+
+
+def type_error(err: Error):
+    value, expected = err
     return TypeError(f"Expected type {expected}, got {type(value)} (value: {value})")
