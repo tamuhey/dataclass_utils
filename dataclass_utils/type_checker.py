@@ -1,29 +1,69 @@
-from typing import Any, Dict, List, Type, TypeVar
+from typing import (
+    Any,
+    Dict,
+    FrozenSet,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
+
+Result = Optional[Tuple[Any, Type]]  # returns error context
 
 
-def check(value: Any, ty: Type):
-    if hasattr(ty, "__origin__"):
-        # generics
-        assert isinstance(value, ty.__origin__)
-        # no typevar
-        if all(isinstance(t, TypeVar) for t in ty.__args__):
-            return
-        if ty.__origin__ is list or ty.__origin__ is set or ty is frozenset:
-            assert len(ty.__args__) == 1
-            check_mono_container(value, ty.__args__[0])
-        elif ty.__origin__ is dict:
-            assert len(ty.__args__) == 2
-            check_dict(value, *ty.__args__)
-    else:
-        assert isinstance(value, ty)
+def check(value: Any, ty: Type) -> Result:
+    if isinstance(ty, type):
+        if not isinstance(value, ty):
+            return value, ty
+
+    if hasattr(ty, "__origin__"):  # generics
+        to = ty.__origin__
+        check(value, to)
+        if to in {list, set, frozenset}:
+            check_mono_container(value, ty)
+        elif to is dict:
+            check_dict(value, ty)
+        elif to is Union:
+            check_union(value, ty)
 
 
-def check_mono_container(value: List, ty_item: Type):
+def check_union(value: Any, ty: Type[Union]) -> Result:
+    if any(check(value, t) for t in ty.__args__):
+        return None
+    return (ty, value)
+
+
+def check_mono_container(
+    value: Any, ty: Union[Type[List], Type[Set], Type[FrozenSet]]
+) -> Result:
+    ty_item = next(iter(ty.__args__))  # type: ignore
     for v in value:
-        check(v, ty_item)
+        err = check(v, ty_item)
+        if is_error(err):
+            return err
+    return None
 
 
-def check_dict(value: Dict, ty_key: Type, ty_value: Type):
+def check_dict(value: Dict, ty: Type[Dict]) -> Result:
+    args = iter(ty.__args__)  # type: ignore
+    ty_key = next(args)
+    ty_item = next(args)
     for k, v in value.items():
-        check(k, ty_key)
-        check(v, ty_value)
+        err = check(k, ty_key)
+        if is_error(err):
+            return err
+        err = check(v, ty_item)
+        if is_error(err):
+            return err
+    return None
+
+
+def is_typevar(ty: Type) -> bool:
+    return isinstance(ty, TypeVar)
+
+
+def is_error(ret: Result) -> bool:
+    return ret is not None
