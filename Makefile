@@ -7,6 +7,6 @@ lint:
 	black ${MODULE}
 	mypy ${MODULE}
 
-test: lint
+test:
 	pytest
 
