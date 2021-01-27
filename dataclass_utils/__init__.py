@@ -16,8 +16,7 @@ class _runtime_typecheck_inner(Generic[T]):
         for arg, field in zip(args, self.fields):
             assert isinstance(arg, _get_field_type(field))
         for k, v in kwargs.items():
-            field: dataclasses.Field = self.fields_dict[k]
-            assert isinstance(v, _get_field_type(field))
+            assert isinstance(v, _get_field_type(self.fields_dict[k]))
         ret = self.ty(*args, **kwargs)  # type: ignore
         return ret
 
