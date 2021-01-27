@@ -12,6 +12,9 @@ class Foo:
 
 
 def test_main():
-    Foo(1, ["a"])
+    foo = Foo(1, ["a"])
+    isinstance(foo, Foo)
     with pytest.raises(AssertionError):
         Foo("a", 2)
+    with pytest.raises(AssertionError):
+        Foo(1, [1, 2])
