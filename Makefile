@@ -1,4 +1,4 @@
-.PHONY: lint
+.PHONY: lint test
 
 MODULE="dataclass_utils"
 lint:
