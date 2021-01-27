@@ -33,7 +33,6 @@ class Foo:
     b: List[str]
 
 foo = Foo(1, ["a"])  # ok
-assert isinstance(foo, Foo) # Still, it is an instance of `Foo`
 
 import pytest
 
