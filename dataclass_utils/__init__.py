@@ -21,6 +21,12 @@ class _runtime_typecheck_inner(Generic[T]):
         ret = self.ty(*args, **kwargs)  # type: ignore
         return ret
 
+    def __instancecheck__(self, instance: Any) -> bool:
+        return self.ty.__instancecheck__(instance)
+
+    def __subclasscheck__(self, subclass: type) -> bool:
+        return self.ty.__subclasscheck__(subclass)
+
 
 def runtime_typecheck(ty: Type[T]) -> Type[T]:
     """
@@ -35,7 +41,7 @@ def runtime_typecheck(ty: Type[T]) -> Type[T]:
 
 
     >>> foo = Foo(1, ["a"])  # ok
-    >>> isinstance(foo, Foo) # Still, it is an instance of `Foo`
+    >>> assert isinstance(foo, Foo) # Still, it is an instance of `Foo`
     >>> import pytest
     >>> with pytest.raises(AssertionError):
     ...     Foo("a", [])
