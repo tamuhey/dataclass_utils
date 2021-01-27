@@ -1,6 +1,7 @@
 import pytest
 from typing import (
     Any,
+    AnyStr,
     Callable,
     Dict,
     FrozenSet,
@@ -28,6 +29,7 @@ class A:
     any_: Any = "foo"
     call: Callable[[int], str] = lambda x: "foo"
     lit: Literal["a", 1] = 1
+    anystr: AnyStr = "foo"
 
 
 @runtime_typecheck
@@ -121,3 +123,9 @@ def test_callable():
 def test_literal():
     with pytest.raises(TypeError):
         A(1, [], lit=12)
+
+
+def test_anystr():
+    A(1, [], anystr=b"foo")
+    with pytest.raises(TypeError):
+        A(1, [], anystr=1)

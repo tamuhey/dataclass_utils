@@ -2,6 +2,7 @@ from dataclass_utils.error import Error, type_error
 import dataclasses
 from typing import (
     Any,
+    AnyStr,
     Dict,
     FrozenSet,
     Generic,
@@ -39,6 +40,11 @@ def check(value: Any, ty: Type) -> Result:
         if not isinstance(value, ty.ty):  # type: ignore
             return value, ty
 
+    if ty is AnyStr:
+        err = check_anystr(value, ty)
+        if is_error(err):
+            return err
+
     if hasattr(ty, "__origin__"):  # generics
         to = ty.__origin__
         err = check(value, to)
@@ -63,6 +69,12 @@ def check(value: Any, ty: Type) -> Result:
         err = check_dataclass(value, ty)
         if is_error(err):
             return err
+
+
+def check_anystr(value: Any, ty: Type) -> Result:
+    if all(not isinstance(value, t) for t in ty.__constraints__):
+        return (value, ty)
+    return None
 
 
 def check_literal(value: Any, ty: Type) -> Result:
