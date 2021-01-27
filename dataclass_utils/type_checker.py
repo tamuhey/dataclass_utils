@@ -6,6 +6,7 @@ from typing import (
     FrozenSet,
     Generic,
     List,
+    Literal,
     Optional,
     Set,
     Tuple,
@@ -50,6 +51,8 @@ def check(value: Any, ty: Type) -> Result:
             err = check_dict(value, ty)
         elif to is tuple:
             err = check_tuple(value, ty)
+        elif to is Literal:
+            err = check_literal(value, ty)
         elif to is Union:
             err = check_union(value, ty)
 
@@ -60,6 +63,12 @@ def check(value: Any, ty: Type) -> Result:
         err = check_dataclass(value, ty)
         if is_error(err):
             return err
+
+
+def check_literal(value: Any, ty: Type) -> Result:
+    if all(value != t for t in ty.__args__):
+        return (value, ty)
+    return None
 
 
 def check_tuple(value: Any, ty: Type[Tuple]) -> Result:

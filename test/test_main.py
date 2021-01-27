@@ -1,5 +1,16 @@
 import pytest
-from typing import Any, Callable, Dict, FrozenSet, List, Optional, Set, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    FrozenSet,
+    List,
+    Literal,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+)
 from dataclass_utils import check_type, runtime_typecheck
 import dataclasses
 
@@ -16,6 +27,7 @@ class A:
     opt: Optional[FrozenSet[str]] = None
     any_: Any = "foo"
     call: Callable[[int], str] = lambda x: "foo"
+    lit: Literal["a", 1] = 1
 
 
 @runtime_typecheck
@@ -104,3 +116,8 @@ def test_optional():
 def test_callable():
     with pytest.raises(TypeError):
         A(1, [], call=1)
+
+
+def test_literal():
+    with pytest.raises(TypeError):
+        A(1, [], lit=12)
