@@ -47,6 +47,8 @@ def check(value: Any, ty: Type) -> Result:
             err = check_mono_container(value, ty)
         elif to is dict:
             err = check_dict(value, ty)
+        elif to is tuple:
+            err = check_tuple(value, ty)
         elif to is Union:
             err = check_union(value, ty)
 
@@ -57,6 +59,17 @@ def check(value: Any, ty: Type) -> Result:
         err = check_dataclass(value, ty)
         if is_error(err):
             return err
+
+
+def check_tuple(value: Any, ty: Type[Tuple]) -> Result:
+    types = ty.__args__  # type: ignore
+    if len(value) != len(types):
+        return (value, ty)
+    for v, t in zip(value, types):
+        err = check(v, t)
+        if is_error(err):
+            return err
+    return None
 
 
 def check_union(value: Any, ty) -> Result:

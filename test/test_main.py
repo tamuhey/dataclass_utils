@@ -1,5 +1,5 @@
 import pytest
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Tuple, Union
 from dataclass_utils import check_type, runtime_typecheck
 import dataclasses
 
@@ -12,6 +12,7 @@ class A:
     c: List[List[Dict[str, int]]] = dataclasses.field(default_factory=list)
     d: Union[int, str, None] = None
     e: Optional[int] = None
+    tup: Tuple[int, str] = (1, "foo")
 
 
 @runtime_typecheck
@@ -85,3 +86,8 @@ def test_union():
     A(1, [], d=1)
     with pytest.raises(TypeError):
         A(1, [], d=1.2)
+
+
+def test_tuple():
+    with pytest.raises(TypeError):
+        A(1, [], tup=(1, 1))
