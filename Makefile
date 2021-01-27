@@ -8,6 +8,6 @@ lint:
 	mypy ${MODULE}
 
 test:
-	pytest
-	python -m doctest README.md
+	poetry run pytest
+	poetry run python -m doctest README.md
 
