@@ -1,8 +1,10 @@
-from dataclass_utils.error import Error
+from dataclass_utils.error import Error, type_error
+import dataclasses
 from typing import (
     Any,
     Dict,
     FrozenSet,
+    Generic,
     List,
     Optional,
     Set,
@@ -30,6 +32,11 @@ def check(value: Any, ty: Type) -> Result:
         if not isinstance(value, ty):
             return value, ty
 
+    # Decorated dataclass
+    if isinstance(ty, runtime_typecheck_inner):
+        if not isinstance(value, ty.ty):  # type: ignore
+            return value, ty
+
     if hasattr(ty, "__origin__"):  # generics
         to = ty.__origin__
         err = check(value, to)
@@ -43,6 +50,11 @@ def check(value: Any, ty: Type) -> Result:
         elif to is Union:
             err = check_union(value, ty)
 
+        if is_error(err):
+            return err
+
+    if dataclasses.is_dataclass(value):
+        err = check_dataclass(value, ty)
         if is_error(err):
             return err
 
@@ -78,9 +90,43 @@ def check_dict(value: Dict, ty: Type[Dict]) -> Result:
     return None
 
 
+def check_dataclass(value: Any, ty: Type) -> Result:
+    for k, ty in value.__annotations__.items():
+        v = getattr(value, k)
+        err = check(v, ty)
+        if err is not None:
+            return err
+
+
 def is_typevar(ty: Type) -> bool:
     return isinstance(ty, TypeVar)
 
 
 def is_error(ret: Result) -> bool:
     return ret is not None
+
+
+def check_root(value: Any):
+    err = check_dataclass(value, type(value))
+    if err is not None:
+        raise type_error(err)
+
+
+T = TypeVar("T")
+
+# This is here because of dependency
+class runtime_typecheck_inner(Generic[T]):
+    def __init__(self, ty: Type):
+        assert dataclasses.is_dataclass(ty)
+        self.ty = ty
+
+    def __call__(self, *args, **kwargs) -> T:
+        ret = self.ty(*args, **kwargs)  # type: ignore
+        check_root(ret)
+        return ret
+
+    def __instancecheck__(self, instance: Any) -> bool:
+        return self.ty.__instancecheck__(instance)
+
+    def __subclasscheck__(self, subclass: type) -> bool:
+        return self.ty.__subclasscheck__(subclass)
