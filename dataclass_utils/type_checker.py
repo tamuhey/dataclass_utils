@@ -1,4 +1,3 @@
-from dataclass_utils.error import Error, type_error
 import dataclasses
 from typing import (
     Any,
@@ -14,8 +13,9 @@ from typing import (
     Type,
     TypeVar,
     Union,
-    Optional,
 )
+
+from dataclass_utils.error import Error, type_error
 
 Result = Optional[Error]  # returns error context
 
@@ -69,6 +69,7 @@ def check(value: Any, ty: Type) -> Result:
         err = check_dataclass(value, ty)
         if is_error(err):
             return err
+    return None
 
 
 def check_anystr(value: Any, ty: Type) -> Result:
@@ -131,6 +132,7 @@ def check_dataclass(value: Any, ty: Type) -> Result:
         err = check(v, ty)
         if err is not None:
             return err
+    return None
 
 
 def is_typevar(ty: Type) -> bool:

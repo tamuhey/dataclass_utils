@@ -1,6 +1,5 @@
 from typing import Any, Tuple, Type
 
-
 Error = Tuple[Any, Type]
 
 

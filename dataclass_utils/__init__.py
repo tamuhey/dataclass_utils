@@ -35,12 +35,10 @@ r"""
 ...     Foo(1, [1, 2])
 """
 
-from dataclass_utils.type_checker import (
-    check_root as check_type,
-    runtime_typecheck_inner,
-)
-from typing import TypeVar, Type
+from typing import Type, TypeVar
 
+from dataclass_utils.type_checker import check_root as check_type
+from dataclass_utils.type_checker import runtime_typecheck_inner
 
 T = TypeVar("T")
 
