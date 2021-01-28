@@ -1,8 +1,16 @@
-from typing import Any, Tuple, Type
+from typing import Any, List, Optional, Tuple, Type
+from dataclasses import dataclass, field
 
-Error = Tuple[Any, Type]
+
+@dataclass
+class Error:
+    ty: Type[Any]
+    value: Any
+    path: List[str] = field(default_factory=list)
 
 
 def type_error(err: Error):
-    value, expected = err
-    return TypeError(f"Expected type {expected}, got {type(value)} (value: {value})")
+    path = " -> ".join(reversed(err.path))
+    return TypeError(
+        f"Error in field '{path}'. Expected type {err.ty}, got {type(err.value)} (value: {err.value})"
+    )

@@ -33,12 +33,12 @@ def check(value: Any, ty: Type) -> Result:
     """
     if isinstance(ty, type):
         if not isinstance(value, ty):
-            return value, ty
+            return Error(ty, value)
 
     # Decorated dataclass
     if isinstance(ty, runtime_typecheck_inner):
         if not isinstance(value, ty.ty):  # type: ignore
-            return value, ty
+            return Error(ty.ty, value)  # type: ignore
 
     if ty is AnyStr:
         err = check_anystr(value, ty)
@@ -74,20 +74,20 @@ def check(value: Any, ty: Type) -> Result:
 
 def check_anystr(value: Any, ty: Type) -> Result:
     if all(not isinstance(value, t) for t in ty.__constraints__):
-        return (value, ty)
+        return Error(ty=ty, value=value)
     return None
 
 
 def check_literal(value: Any, ty: Type) -> Result:
     if all(value != t for t in ty.__args__):
-        return (value, ty)
+        return Error(ty=ty, value=value)
     return None
 
 
 def check_tuple(value: Any, ty: Type[Tuple]) -> Result:
     types = ty.__args__  # type: ignore
     if len(value) != len(types):
-        return (value, ty)
+        return Error(ty=ty, value=value)
     for v, t in zip(value, types):
         err = check(v, t)
         if is_error(err):
@@ -98,7 +98,7 @@ def check_tuple(value: Any, ty: Type[Tuple]) -> Result:
 def check_union(value: Any, ty) -> Result:
     if any(not is_error(check(value, t)) for t in ty.__args__):
         return None
-    return (value, ty)
+    return Error(ty=ty, value=value)
 
 
 def check_mono_container(
@@ -122,6 +122,7 @@ def check_dict(value: Dict, ty: Type[Dict]) -> Result:
             return err
         err = check(v, ty_item)
         if is_error(err):
+            err.path.append(k)
             return err
     return None
 
@@ -131,6 +132,7 @@ def check_dataclass(value: Any, ty: Type) -> Result:
         v = getattr(value, k)
         err = check(v, ty)
         if err is not None:
+            err.path.append(k)
             return err
     return None
 
