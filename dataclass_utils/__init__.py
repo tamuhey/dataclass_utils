@@ -40,6 +40,7 @@ from typing import Type, TypeVar
 from dataclass_utils.type_checker import check_root as check_type
 from dataclass_utils.type_checker import runtime_typecheck_inner
 from dataclass_utils.into_dataclass import into_dataclass
+from .VERSION import __version__
 
 T = TypeVar("T")
 
@@ -48,4 +49,4 @@ def runtime_typecheck(ty: Type[T]) -> Type[T]:
     return runtime_typecheck_inner(ty)  # type: ignore
 
 
-__all__ = ["runtime_typecheck", "check_type", "into_dataclass"]
+__all__ = ["runtime_typecheck", "check_type", "into_dataclass", "__version__"]
