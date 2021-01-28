@@ -17,3 +17,8 @@ autoflake = "^1.4"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.versionup]
+tag = false
+commit = false
+files = ["dataclass_utils/VERSION.py"]
