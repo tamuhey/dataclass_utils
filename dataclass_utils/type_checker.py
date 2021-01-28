@@ -144,6 +144,7 @@ def is_error(ret: Result) -> bool:
 
 
 def check_root(value: Any):
+    """Check dataclass type recursively"""
     err = check_dataclass(value, type(value))
     if err is not None:
         raise type_error(err)

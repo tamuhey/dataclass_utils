@@ -6,45 +6,41 @@
 
 ### `check_type` function
 
+Check dataclass type recursively
+
 ```python
->>> from dataclass_utils import check_type
->>> import dataclasses
->>> from typing import List
+from dataclass_utils import check_type
+import dataclasses
+from typing import List
 
->>> @dataclasses.dataclass
-... class Foo:
-...     a: int
-...     b: List[str]
+@dataclasses.dataclass
+class Foo:
+    a: int
+    b: List[str]
 
->>> import pytest
+import pytest
 
->>> check_type(Foo(1, ["b"])) # OK
+check_type(Foo(1, ["b"])) # OK
 
->>> with pytest.raises(TypeError):
-...     check_type(Foo("a", [2]))
-
+with pytest.raises(TypeError):
+    check_type(Foo("a", [2]))
 ```
 
-### `runtime_typecheck` decorator
+### `into_dataclass` function
+
+Recursively constructs dataclass from dict
 
 ```python
->>> from dataclass_utils import runtime_typecheck
->>> from typing import List
+@dataclasses.dataclass
+class Foo:
+    a: int
 
->>> @runtime_typecheck
-... @dataclasses.dataclass
-... class Foo:
-...     a: int
-...     b: List[str]
+@dataclasses.dataclass
+class Bar:
+    foo: Foo
+    b: str
 
->>> foo = Foo(1, ["a"])  # ok
-
->>> import pytest
-
->>> with pytest.raises(TypeError):
-...    Foo("a", [])
-
->>> with pytest.raises(TypeError):
-...    Foo(1, [1, 2])
-
+data = {"foo": {"a": 1}, "b": "foo"}
+bar = into_dataclass(Bar, data)
+assert bar.foo == Foo(**data["foo"]) # field `foo` is instantiated as `Foo`, not dict
 ```

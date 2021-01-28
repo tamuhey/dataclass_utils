@@ -1,14 +1,29 @@
 """Convert dict into dataclass"""
 
-from typing import Any, Dict, Type, TypeVar
 import dataclasses
-from dataclass_utils.error import type_error
+from typing import Any, Dict, Type, TypeVar
 
+from dataclass_utils.error import type_error
 
 T = TypeVar("T")
 
 
 def into_dataclass(kls: Type[T], value: Dict[str, Any]) -> T:
+    """Recursively constructs dataclass from dict
+
+    # Example
+
+    >>> @dataclasses.dataclass
+    ... class Foo:
+    ...     a: int
+    >>> @dataclasses.dataclass
+    ... class Bar:
+    ...     foo: Foo
+    ...     b: str
+    >>> data = {"foo": {"a": 1}, "b": "foo"}
+    >>> bar = into_dataclass(Bar, data)
+    >>> assert bar.foo == Foo(**data["foo"]) # field `foo` is instantiated as `Foo`, not dict
+    """
     if not isinstance(value, dict):
         raise type_error((value, dict))
     if not dataclasses.is_dataclass(kls):

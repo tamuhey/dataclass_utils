@@ -9,5 +9,4 @@ lint:
 
 test:
 	poetry run pytest
-	poetry run python -m doctest README.md
 
