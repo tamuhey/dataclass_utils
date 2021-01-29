@@ -172,3 +172,17 @@ def test_fowardref():
     G(E(1))
     with pytest.raises(TypeError):
         G(E("a"))
+
+
+@dataclasses.dataclass
+class H:
+    a: None
+
+    def __post_init__(self):
+        check_type(self)
+
+
+def test_none():
+    H(None)
+    with pytest.raises(TypeError):
+        H(1)

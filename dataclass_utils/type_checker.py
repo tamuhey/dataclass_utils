@@ -74,13 +74,13 @@ def check_anystr(value: Any, ty: Type) -> Result:
 
 
 def check_literal(value: Any, ty: Type) -> Result:
-    if all(value != t for t in ty.__args__):
+    if all(value != t for t in typing.get_args(ty)):
         return Error(ty=ty, value=value)
     return None
 
 
 def check_tuple(value: Any, ty: Type[Tuple]) -> Result:
-    types = ty.__args__  # type: ignore
+    types = typing.get_args(ty)
     if len(value) != len(types):
         return Error(ty=ty, value=value)
     for v, t in zip(value, types):
@@ -91,7 +91,7 @@ def check_tuple(value: Any, ty: Type[Tuple]) -> Result:
 
 
 def check_union(value: Any, ty) -> Result:
-    if any(not is_error(check(value, t)) for t in ty.__args__):
+    if any(not is_error(check(value, t)) for t in typing.get_args(ty)):
         return None
     return Error(ty=ty, value=value)
 
