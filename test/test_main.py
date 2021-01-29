@@ -10,13 +10,16 @@ from typing import (
     Optional,
     Set,
     Tuple,
+    Type,
+    TypeVar,
     Union,
 )
-from dataclass_utils import check_type, runtime_typecheck
+from dataclass_utils import check_type
 import dataclasses
 
+T = TypeVar("T")
 
-@runtime_typecheck
+
 @dataclasses.dataclass
 class A:
     a: int
@@ -29,13 +32,17 @@ class A:
     any_: Any = "foo"
     call: Callable[[int], str] = lambda x: "foo"
     lit: Literal["a", 1] = 1
-    anystr: AnyStr = "foo"
+
+    def __post_init__(self):
+        check_type(self)
 
 
-@runtime_typecheck
 @dataclasses.dataclass
 class B:
     foo: A
+
+    def __post_init__(self):
+        check_type(self)
 
 
 @dataclasses.dataclass
@@ -43,31 +50,37 @@ class C:
     x: int
     y: Set[str]
 
+    def __post_init__(self):
+        check_type(self)
+
 
 @dataclasses.dataclass
 class D:
     c: C
     d: int
 
+    def __post_init__(self):
+        check_type(self)
+
 
 def test_check_type_nested():
     with pytest.raises(TypeError):
-        check_type(D(C(1, {"foo", 1}), 1))
+        D(C(1, {"foo", 1}), 1)
     with pytest.raises(TypeError):
-        check_type(C(1, []))
+        C(1, [])
 
 
 def test_check_type():
-    check_type(C(1, set()))
+    C(1, set())
     with pytest.raises(TypeError):
-        check_type(C(1, []))
+        C(1, [])
 
 
 def test_nest_dataclass():
     foo = A(1, [])
     B(foo)
     with pytest.raises(TypeError):
-        B(1)
+        (B(1))
 
 
 def test_basic():
@@ -125,7 +138,23 @@ def test_literal():
         A(1, [], lit=12)
 
 
-def test_anystr():
-    A(1, [], anystr=b"foo")
+@dataclasses.dataclass
+class E:
+    x: int
+
+    def __post_init__(self):
+        check_type(self)
+
+
+@dataclasses.dataclass
+class F(E):
+    y: int
+
+    def __post_init__(self):
+        check_type(self)
+
+
+def test_inherited():
+    F(x=1, y=2)
     with pytest.raises(TypeError):
-        A(1, [], anystr=1)
+        F("foo", 2)

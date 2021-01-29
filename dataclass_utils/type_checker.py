@@ -14,6 +14,7 @@ from typing import (
     TypeVar,
     Union,
 )
+import typing
 
 from dataclass_utils.error import Error, type_error
 
@@ -35,18 +36,12 @@ def check(value: Any, ty: Type) -> Result:
         if not isinstance(value, ty):
             return Error(ty, value)
 
-    # Decorated dataclass
-    if isinstance(ty, runtime_typecheck_inner):
-        if not isinstance(value, ty.ty):  # type: ignore
-            return Error(ty.ty, value)  # type: ignore
-
     if ty is AnyStr:
         err = check_anystr(value, ty)
         if is_error(err):
             return err
 
-    if hasattr(ty, "__origin__"):  # generics
-        to = ty.__origin__
+    if (to := typing.get_origin(ty)) is not None:  # generics
         err = check(value, to)
         if is_error(err):
             return err
@@ -104,7 +99,7 @@ def check_union(value: Any, ty) -> Result:
 def check_mono_container(
     value: Any, ty: Union[Type[List], Type[Set], Type[FrozenSet]]
 ) -> Result:
-    ty_item = next(iter(ty.__args__))  # type: ignore
+    ty_item = typing.get_args(ty)[0]
     for v in value:
         err = check(v, ty_item)
         if is_error(err):
@@ -113,9 +108,9 @@ def check_mono_container(
 
 
 def check_dict(value: Dict, ty: Type[Dict]) -> Result:
-    args = iter(ty.__args__)  # type: ignore
-    ty_key = next(args)
-    ty_item = next(args)
+    args = typing.get_args(ty)
+    ty_key = args[0]
+    ty_item = args[1]
     for k, v in value.items():
         err = check(k, ty_key)
         if is_error(err):
@@ -128,7 +123,7 @@ def check_dict(value: Dict, ty: Type[Dict]) -> Result:
 
 
 def check_dataclass(value: Any, ty: Type) -> Result:
-    for k, ty in value.__annotations__.items():
+    for k, ty in typing.get_type_hints(ty).items():
         v = getattr(value, k)
         err = check(v, ty)
         if err is not None:
@@ -150,23 +145,3 @@ def check_root(value: Any):
     err = check_dataclass(value, type(value))
     if err is not None:
         raise type_error(err)
-
-
-T = TypeVar("T")
-
-# This is here because of dependency
-class runtime_typecheck_inner(Generic[T]):
-    def __init__(self, ty: Type):
-        assert dataclasses.is_dataclass(ty)
-        self.ty = ty
-
-    def __call__(self, *args, **kwargs) -> T:
-        ret = self.ty(*args, **kwargs)  # type: ignore
-        check_root(ret)
-        return ret
-
-    def __instancecheck__(self, instance: Any) -> bool:
-        return self.ty.__instancecheck__(instance)
-
-    def __subclasscheck__(self, subclass: type) -> bool:
-        return self.ty.__subclasscheck__(subclass)
