@@ -158,3 +158,17 @@ def test_inherited():
     F(x=1, y=2)
     with pytest.raises(TypeError):
         F("foo", 2)
+
+
+@dataclasses.dataclass
+class G:
+    y: "E"
+
+    def __post_init__(self):
+        check_type(self)
+
+
+def test_fowardref():
+    G(E(1))
+    with pytest.raises(TypeError):
+        G(E("a"))
