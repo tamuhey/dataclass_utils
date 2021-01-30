@@ -20,7 +20,13 @@ import dataclasses
 T = TypeVar("T")
 
 
+def check(kls: Type) -> Type:
+    kls.__post_init__ = lambda self: check_type(self)
+    return kls
+
+
 @dataclasses.dataclass
+@check
 class A:
     a: int
     b: List[str]
@@ -33,34 +39,25 @@ class A:
     call: Callable[[int], str] = lambda x: "foo"
     lit: Literal["a", 1] = 1
 
-    def __post_init__(self):
-        check_type(self)
-
 
 @dataclasses.dataclass
+@check
 class B:
     foo: A
 
-    def __post_init__(self):
-        check_type(self)
-
 
 @dataclasses.dataclass
+@check
 class C:
     x: int
     y: Set[str]
 
-    def __post_init__(self):
-        check_type(self)
-
 
 @dataclasses.dataclass
+@check
 class D:
     c: C
     d: int
-
-    def __post_init__(self):
-        check_type(self)
 
 
 def test_check_type_nested():
@@ -139,19 +136,15 @@ def test_literal():
 
 
 @dataclasses.dataclass
+@check
 class E:
     x: int
 
-    def __post_init__(self):
-        check_type(self)
-
 
 @dataclasses.dataclass
+@check
 class F(E):
     y: int
-
-    def __post_init__(self):
-        check_type(self)
 
 
 def test_inherited():
@@ -161,11 +154,9 @@ def test_inherited():
 
 
 @dataclasses.dataclass
+@check
 class G:
     y: "E"
-
-    def __post_init__(self):
-        check_type(self)
 
 
 def test_fowardref():
@@ -175,11 +166,9 @@ def test_fowardref():
 
 
 @dataclasses.dataclass
+@check
 class H:
     a: None
-
-    def __post_init__(self):
-        check_type(self)
 
 
 def test_none():
