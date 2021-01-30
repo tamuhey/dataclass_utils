@@ -8,6 +8,7 @@ from typing import (
     List,
     Literal,
     Optional,
+    OrderedDict,
     Set,
     Tuple,
     Type,
@@ -20,8 +21,9 @@ import dataclasses
 T = TypeVar("T")
 
 
-def check(kls: Type) -> Type:
-    kls.__post_init__ = lambda self: check_type(self)
+def check(kls: T) -> T:
+    f = lambda self: check_type(self)
+    setattr(kls, "__post_init__", f)
     return kls
 
 
@@ -175,3 +177,15 @@ def test_none():
     H(None)
     with pytest.raises(TypeError):
         H(1)
+
+
+@dataclasses.dataclass
+@check
+class I:
+    a: OrderedDict[str, int]
+
+
+def test_ordered_dict():
+    I(OrderedDict({"foo": 1}))
+    with pytest.raises(TypeError):
+        I({"foo": 1})
