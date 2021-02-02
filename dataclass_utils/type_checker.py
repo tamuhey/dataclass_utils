@@ -33,7 +33,10 @@ def check(value: Any, ty: Type) -> Result:
     >>> assert is_error(check(1.3, Union[str, int]))
     """
     if isinstance(ty, type):
-        if not isinstance(value, ty):
+        if ty is int:  # For boolean
+            if type(value) is not ty:
+                return Error(ty, value)
+        elif not isinstance(value, ty):
             return Error(ty, value)
 
     if ty is AnyStr:

@@ -56,3 +56,11 @@ def test_error_dict_key():
     assert "c" in err.path
     assert "b" in err.path
     assert 1 not in err.path
+
+
+def test_bool():
+    assert is_error(check(1, bool))
+    assert not is_error(check(1, int))
+
+    assert not is_error(check(False, bool))
+    assert is_error(check(False, int))
