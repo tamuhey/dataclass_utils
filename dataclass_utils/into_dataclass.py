@@ -2,6 +2,7 @@
 
 import dataclasses
 from typing import Any, Dict, Type, TypeVar
+from .error import Error
 
 from dataclass_utils.error import type_error
 
@@ -25,7 +26,7 @@ def into_dataclass(kls: Type[T], value: Dict[str, Any]) -> T:
     >>> assert bar.foo == Foo(**data["foo"]) # field `foo` is instantiated as `Foo`, not dict
     """
     if not isinstance(value, dict):
-        raise type_error((value, dict))
+        raise type_error(Error(value=value, ty=dict))
     if not dataclasses.is_dataclass(kls):
         raise TypeError(f"Expected dataclass type, got {kls}")
 

@@ -12,4 +12,5 @@ test: run_example
 
 run_example:
 	ls examples/*py | xargs poetry run python
+	poetry run mypy dataclass_utils
 

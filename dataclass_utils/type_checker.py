@@ -114,7 +114,7 @@ def check_dict(value: Dict, ty: Type[Dict]) -> Result:
         if is_error(err):
             return err
         err = check(v, ty_item)
-        if is_error(err):
+        if err is not None:
             err.path.append(k)
             return err
     return None
