@@ -32,19 +32,11 @@ def check(value: Any, ty: Type) -> Result:
     >>> assert is_error(check(1.3, int))
     >>> assert is_error(check(1.3, Union[str, int]))
     """
-    if isinstance(ty, type):
-        if ty is int:  # For boolean
-            if type(value) is not ty:
-                return Error(ty, value)
-        elif not isinstance(value, ty):
-            return Error(ty, value)
-
-    if ty is AnyStr:
-        err = check_anystr(value, ty)
-        if is_error(err):
-            return err
-
-    if (to := typing.get_origin(ty)) is not None:  # generics
+    if dataclasses.is_dataclass(value):
+        # dataclass
+        return check_dataclass(value, ty)
+    elif (to := typing.get_origin(ty)) is not None:
+        # generics
         err = check(value, to)
         if is_error(err):
             return err
@@ -59,19 +51,22 @@ def check(value: Any, ty: Type) -> Result:
             err = check_literal(value, ty)
         elif to is Union:
             err = check_union(value, ty)
+        return err
+    elif isinstance(ty, type):
+        # concrete type
+        if issubclass(ty, bool):
+            if not isinstance(value, ty):
+                return Error(ty=ty, value=value)
+        elif issubclass(ty, int):  # For boolean
+            return check_int(value, ty)
+        elif not isinstance(value, ty):
+            return Error(ty=ty, value=value)
 
-        if is_error(err):
-            return err
-
-    if dataclasses.is_dataclass(value):
-        err = check_dataclass(value, ty)
-        if is_error(err):
-            return err
     return None
 
 
-def check_anystr(value: Any, ty: Type) -> Result:
-    if all(not isinstance(value, t) for t in ty.__constraints__):
+def check_int(value, ty: Type) -> Result:
+    if isinstance(value, bool) or not isinstance(value, ty):
         return Error(ty=ty, value=value)
     return None
 

@@ -16,15 +16,8 @@ from typing import (
     Union,
 )
 from dataclass_utils import check_type
+from .utils import check
 import dataclasses
-
-T = TypeVar("T")
-
-
-def check(kls: T) -> T:
-    f = lambda self: check_type(self)
-    setattr(kls, "__post_init__", f)
-    return kls
 
 
 @dataclasses.dataclass
