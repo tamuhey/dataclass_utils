@@ -1,4 +1,4 @@
-.PHONY: lint test
+.PHONY: lint test exapmle
 
 MODULE="dataclass_utils"
 lint:
@@ -7,6 +7,9 @@ lint:
 	black ${MODULE}
 	mypy ${MODULE}
 
-test:
+test: run_example
 	poetry run pytest
+
+run_example:
+	ls examples | xargs poetry run python
 
