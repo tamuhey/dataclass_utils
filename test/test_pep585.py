@@ -1,6 +1,12 @@
+from __future__ import annotations
 from typing import Optional
+import pytest
 from .utils import check
 import dataclasses
+import sys
+
+if sys.version_info < (3, 9):
+    pytestmark = pytest.mark.skip()
 
 
 @dataclasses.dataclass

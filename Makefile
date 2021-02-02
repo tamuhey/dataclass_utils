@@ -11,5 +11,5 @@ test: run_example
 	poetry run pytest
 
 run_example:
-	ls examples | xargs poetry run python
+	ls examples/*py | xargs poetry run python
 
