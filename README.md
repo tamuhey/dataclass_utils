@@ -26,4 +26,4 @@ with pytest.raises(TypeError):
     check_type(Foo("a", [2]))
 ```
 
-See [example](./example) directory for more examples.
+See [examples](./example) directory for more examples.
