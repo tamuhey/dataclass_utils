@@ -26,21 +26,4 @@ with pytest.raises(TypeError):
     check_type(Foo("a", [2]))
 ```
 
-### `into_dataclass` function
-
-Recursively constructs dataclass from dict
-
-```python
-@dataclasses.dataclass
-class Foo:
-    a: int
-
-@dataclasses.dataclass
-class Bar:
-    foo: Foo
-    b: str
-
-data = {"foo": {"a": 1}, "b": "foo"}
-bar = into_dataclass(Bar, data)
-assert bar.foo == Foo(**data["foo"]) # field `foo` is instantiated as `Foo`, not dict
-```
+See [example](./example) directory for more examples.
