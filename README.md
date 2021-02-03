@@ -16,14 +16,19 @@ from typing import List
 @dataclasses.dataclass
 class Foo:
     a: int
-    b: List[str]
+    b: List[List[int]]
 
 import pytest
 
 check_type(Foo(1, ["b"])) # OK
 
 with pytest.raises(TypeError):
-    check_type(Foo("a", [2]))
+    check_type(Foo(1, [[2, "foo"]])) # NG
 ```
 
-See [examples](./example) directory for more examples.
+See [examples](./examples) directory for more examples.
+
+## Features
+
+- Recursively check type for each fields in dataclass
+    - `check_type` can be applied for nested dataclass, nested containers
