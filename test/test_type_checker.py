@@ -1,5 +1,6 @@
 from dataclass_utils.error import type_error
 from typing import Callable, Dict, Set
+from enum import Enum
 import pytest
 from dataclass_utils.type_checker import check_dataclass, is_error, check
 from dataclasses import dataclass, field
@@ -64,3 +65,12 @@ def test_bool():
 
     assert not is_error(check(False, bool))
     assert is_error(check(False, int))
+
+
+class ENUM(Enum):
+    a = "a"
+
+
+def test_enum():
+    assert is_error(check("a", ENUM))
+    assert not is_error(check(ENUM.a, ENUM))

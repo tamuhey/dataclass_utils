@@ -1,3 +1,4 @@
+from enum import Enum
 import pytest
 from typing import (
     Any,
@@ -182,3 +183,19 @@ def test_ordered_dict():
     I(OrderedDict({"foo": 1}))
     with pytest.raises(TypeError):
         I({"foo": 1})
+
+
+class ENUM(Enum):
+    a = "a"
+
+
+@dataclasses.dataclass
+@check
+class J:
+    a: ENUM
+
+
+def test_enum():
+    J(ENUM.a)
+    with pytest.raises(TypeError):
+        J("a")
