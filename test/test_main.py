@@ -4,6 +4,7 @@ from typing import (
     Any,
     AnyStr,
     Callable,
+    ClassVar,
     Dict,
     FrozenSet,
     List,
@@ -199,3 +200,15 @@ def test_enum():
     J(ENUM.a)
     with pytest.raises(TypeError):
         J("a")
+
+
+@dataclasses.dataclass
+@check
+class K:
+    a: int = 2
+    b: Type[J] = J
+    c: ClassVar[Type[J]] = J
+
+
+def test_classvar():
+    K()
