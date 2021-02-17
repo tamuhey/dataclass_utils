@@ -32,7 +32,7 @@ def check(value: Any, ty: Type) -> Result:
     >>> assert is_error(check(1.3, int))
     >>> assert is_error(check(1.3, Union[str, int]))
     """
-    if dataclasses.is_dataclass(value):
+    if not isinstance(value, type) and dataclasses.is_dataclass(value):
         # dataclass
         return check_dataclass(value, ty)
     elif (to := typing.get_origin(ty)) is not None:
