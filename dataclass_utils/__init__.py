@@ -34,11 +34,12 @@ Recursively constructs dataclass from dict
 
 from typing import Type, TypeVar
 
+from dataclass_utils.into_dataclass import into_root as into
 from dataclass_utils.type_checker import check_root as check_type
-from dataclass_utils.into_dataclass import into_dataclass
+
 from .VERSION import __version__
 
 T = TypeVar("T")
 
 
-__all__ = ["check_type", "into_dataclass", "__version__"]
+__all__ = ["check_type", "__version__", "into"]

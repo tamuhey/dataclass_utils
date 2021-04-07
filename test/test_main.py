@@ -1,5 +1,5 @@
+import dataclasses
 from enum import Enum
-import pytest
 from typing import (
     Any,
     AnyStr,
@@ -17,9 +17,12 @@ from typing import (
     TypeVar,
     Union,
 )
+
+import pytest
+
 from dataclass_utils import check_type
+
 from .utils import check
-import dataclasses
 
 
 @dataclasses.dataclass
@@ -212,3 +215,14 @@ class K:
 
 def test_classvar():
     K()
+
+
+@dataclasses.dataclass
+@check
+class L:
+    a: Union[str, A]
+
+
+def test_union_dataclass():
+    L(a="1")
+    L(A(a=1, b=[]))
