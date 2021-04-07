@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List, Optional, Tuple, Union
+from typing import List, Literal, Optional, Tuple, Union
 
 import pytest
 
@@ -7,8 +7,9 @@ from dataclass_utils import check_type, into
 
 
 def test0():
-    assert into(1, int)
-    assert into({"d": 1}, dict)
+    into(1, int)
+    into({"d": 1}, dict)
+    into(1, Literal[1])
 
 
 @dataclasses.dataclass

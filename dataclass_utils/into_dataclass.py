@@ -1,7 +1,7 @@
 """Convert dict into dataclass"""
 
 import dataclasses
-from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
+from typing import Any, Dict, Iterable, List, Literal, Sized, Type, TypeVar, Union, cast
 import typing
 
 from dataclass_utils.error import Error, type_error
@@ -30,7 +30,6 @@ def into(value: V, kls: Type[T]) -> Result[T]:
         return _into_dataclass(value, kls)
     elif (to := typing.get_origin(kls)) is not None:
         # generics
-        ret = None
         if to is list or to is set or to is frozenset:
             ret = _into_mono_container(value, kls)
         elif to is dict:
@@ -39,12 +38,18 @@ def into(value: V, kls: Type[T]) -> Result[T]:
             ret = _into_tuple(value, kls)
         elif to is Union:
             ret = _into_union(value, kls)
-        if ret is not None:
-            return ret
-
-    if not isinstance(value, kls):
+        elif to is Literal:
+            ret = value
+        else:
+            if isinstance(value, to):
+                ret = value
+            else:
+                ret = Error(kls, value)
+        return ret  # type: ignore
+    else:
+        if isinstance(value, kls):
+            return value
         return Error(kls, value)
-    return value
 
 
 def _is_sized_iterable(v: Any) -> bool:
