@@ -1,6 +1,8 @@
 import dataclasses
 from typing import List, Optional, Tuple, Union
 
+import pytest
+
 from dataclass_utils import check_type, into
 
 
@@ -57,3 +59,15 @@ def test_nest_union():
     d = {"a": {"a": 0, "b": ["foo"]}}
     c = into(d, C)
     check_type(c)
+
+
+@dataclasses.dataclass
+class D:
+    a: Tuple[A, B]
+
+
+def test_nest_tuple():
+    with pytest.raises(TypeError):
+        into({"a": (A(), B(1, A()))}, D)
+    v = into({"a": ({}, {"a": 1, "b": {}})}, D)
+    check_type(v)

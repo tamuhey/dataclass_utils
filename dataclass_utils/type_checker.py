@@ -32,7 +32,7 @@ def check(value: Any, ty: Type) -> Result:
     >>> assert is_error(check(1.3, int))
     >>> assert is_error(check(1.3, Union[str, int]))
     """
-    if not isinstance(value, type) and dataclasses.is_dataclass(value):
+    if not isinstance(value, type) and dataclasses.is_dataclass(ty):
         # dataclass
         return check_dataclass(value, ty)
     elif (to := typing.get_origin(ty)) is not None:
@@ -121,6 +121,8 @@ def check_dict(value: Dict, ty: Type[Dict]) -> Result:
 
 
 def check_dataclass(value: Any, ty: Type) -> Result:
+    if not dataclasses.is_dataclass(value):
+        return Error(ty, value)
     for k, ty in typing.get_type_hints(ty).items():
         v = getattr(value, k)
         err = check(v, ty)

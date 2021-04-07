@@ -64,6 +64,8 @@ def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
     ret = []
     for v, t in zip(val1, types):
         vr = into(v, t)  # type: ignore
+        if is_error(vr):
+            return vr
         ret.append(vr)
     ty_orig = typing.get_origin(kls)
     return ty_orig(ret)
