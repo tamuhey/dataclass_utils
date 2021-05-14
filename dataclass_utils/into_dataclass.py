@@ -47,8 +47,13 @@ def into(value: V, kls: Type[T]) -> Result[T]:
             else:
                 ret = Error(kls, value)
             return ret
-        elif isinstance(value, kls):
-            return value
+        else:
+            try:
+                if isinstance(value, kls):
+                    return value
+            except TypeError:
+                if kls is Any:
+                    return value  # type: ignore
         return Error(kls, value)
 
 

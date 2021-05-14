@@ -1,6 +1,6 @@
 import dataclasses
 import sys
-from typing import List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import pytest
 
@@ -17,6 +17,10 @@ def test0():
     into(1, int)
     into({"d": 1}, dict)
     into(1, Literal[1])
+
+
+def test_any():
+    assert into(1, Any) == 1
 
 
 @dataclasses.dataclass
