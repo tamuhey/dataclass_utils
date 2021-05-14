@@ -28,11 +28,11 @@ Recursively constructs dataclass from dict
 ...     foo: Foo
 ...     b: str
 >>> data = {"foo": {"a": 1}, "b": "foo"}
->>> bar = into_dataclass(Bar, data)
+>>> bar = into(data, Bar)
 >>> assert bar.foo == Foo(**data["foo"]) # field `foo` is instantiated as `Foo`, not dict
 """
 
-from typing import Type, TypeVar
+from typing import TypeVar
 
 from dataclass_utils.into_dataclass import into_root as into
 from dataclass_utils.type_checker import check_root as check_type

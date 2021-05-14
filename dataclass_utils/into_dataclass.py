@@ -39,13 +39,13 @@ def into(value: V, kls: Type[T]) -> Result[T]:
         elif to is Union:
             ret = _into_union(value, kls)
         elif to is Literal:
-            ret = value
+            ret = value  # type: ignore
         else:
             if isinstance(value, to):
                 ret = value
             else:
                 ret = Error(kls, value)
-        return ret  # type: ignore
+        return ret
     else:
         if isinstance(value, kls):
             return value
@@ -61,11 +61,11 @@ def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
         return Error(kls, value)
 
     types = typing.get_args(kls)
-    val0: Sized = value  # type: ignore (bug: https://github.com/microsoft/pyright/issues/1741)
+    val0: Sized = value  # type: ignore
     if len(types) != len(val0):
         return Error(ty=kls, value=val0)
 
-    val1: Iterable = value  # type: ignore (bug: https://github.com/microsoft/pyright/issues/1741)
+    val1: Iterable = value  # type: ignore
     ret = []
     for v, t in zip(val1, types):
         vr = into(v, t)  # type: ignore
@@ -73,6 +73,7 @@ def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
             return vr
         ret.append(vr)
     ty_orig = typing.get_origin(kls)
+    assert ty_orig is not None
     return ty_orig(ret)
 
 
@@ -82,7 +83,9 @@ def _into_dict(value: V, kls: Type[T]) -> Result[T]:
     args = typing.get_args(kls)
     ty_key = args[0]
     ty_item = args[1]
-    ret = typing.get_origin(kls)()
+    orig = typing.get_origin(kls)
+    assert orig is not None
+    ret = orig()
     for k, v in value.items():
         kr = into(k, ty_key)
         if is_error(kr):
@@ -133,7 +136,7 @@ def _into_dataclass(value: V, kls: Type[T]) -> Result[T]:
     ...     foo: Foo
     ...     b: str
     >>> data = {"foo": {"a": 1}, "b": "foo"}
-    >>> bar = into_dataclass(data, Bar)
+    >>> bar = _into_dataclass(data, Bar)
     >>> assert bar.foo == Foo(**data["foo"]) # field `foo` is instantiated as `Foo`, not dict
     """
     if not isinstance(value, dict):
