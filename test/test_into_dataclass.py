@@ -5,6 +5,7 @@ from typing import List, Optional, Tuple, Union
 import pytest
 
 from dataclass_utils import check_type, into
+from dataclass_utils.error import Error
 
 if sys.version_info < (3, 8, 0):
     from typing_extensions import Literal
@@ -21,6 +22,12 @@ def test0():
 @dataclasses.dataclass
 class A0:
     a: int = 0
+
+
+def test_invalid_dict():
+    d = {"a": 1, 1: 2}
+    with pytest.raises(TypeError):
+        into(d, A0)
 
 
 def test1():

@@ -19,7 +19,7 @@ from dataclass_utils.typing import Literal, get_args, get_origin
 Result = Optional[Error]  # returns error context
 
 
-def check(value: Any, ty: Type) -> Result:
+def check(value: Any, ty: Type[Any]) -> Result:
     """
 
     # Examples
@@ -65,19 +65,19 @@ def check(value: Any, ty: Type) -> Result:
     return None
 
 
-def check_int(value, ty: Type) -> Result:
+def check_int(value: Any, ty: Type[Any]) -> Result:
     if isinstance(value, bool) or not isinstance(value, ty):
         return Error(ty=ty, value=value)
     return None
 
 
-def check_literal(value: Any, ty: Type) -> Result:
+def check_literal(value: Any, ty: Type[Any]) -> Result:
     if all(value != t for t in get_args(ty)):
         return Error(ty=ty, value=value)
     return None
 
 
-def check_tuple(value: Any, ty: Type[Tuple]) -> Result:
+def check_tuple(value: Any, ty: Type[Tuple[Any, ...]]) -> Result:
     types = get_args(ty)
     if len(value) != len(types):
         return Error(ty=ty, value=value)
@@ -88,14 +88,14 @@ def check_tuple(value: Any, ty: Type[Tuple]) -> Result:
     return None
 
 
-def check_union(value: Any, ty) -> Result:
+def check_union(value: Any, ty: Type[Any]) -> Result:
     if any(not is_error(check(value, t)) for t in get_args(ty)):
         return None
     return Error(ty=ty, value=value)
 
 
 def check_mono_container(
-    value: Any, ty: Union[Type[List], Type[Set], Type[FrozenSet]]
+    value: Any, ty: Union[Type[List[Any]], Type[Set[Any]], Type[FrozenSet[Any]]]
 ) -> Result:
     ty_item = get_args(ty)[0]
     for v in value:
@@ -105,7 +105,7 @@ def check_mono_container(
     return None
 
 
-def check_dict(value: Dict, ty: Type[Dict]) -> Result:
+def check_dict(value: Dict[Any, Any], ty: Type[Dict[Any, Any]]) -> Result:
     args = get_args(ty)
     ty_key = args[0]
     ty_item = args[1]
@@ -120,7 +120,7 @@ def check_dict(value: Dict, ty: Type[Dict]) -> Result:
     return None
 
 
-def check_dataclass(value: Any, ty: Type) -> Result:
+def check_dataclass(value: Any, ty: Type[Any]) -> Result:
     if not dataclasses.is_dataclass(value):
         return Error(ty, value)
     for k, ty in typing.get_type_hints(ty).items():
@@ -132,7 +132,7 @@ def check_dataclass(value: Any, ty: Type) -> Result:
     return None
 
 
-def is_typevar(ty: Type) -> bool:
+def is_typevar(ty: Type[Any]) -> bool:
     return isinstance(ty, TypeVar)
 
 

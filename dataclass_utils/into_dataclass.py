@@ -8,7 +8,7 @@ from dataclass_utils.typing import Literal, get_args, get_origin
 
 
 T = TypeVar("T")
-V = Union[Dict, List, int, float, str, bool]
+V = Union[Dict[Any, Any], List[Any], int, float, str, bool]
 
 Result = Union[T, Error]
 
@@ -41,9 +41,9 @@ def into(value: V, kls: Type[T]) -> Result[T]:
             elif to is Union:
                 ret = _into_union(value, kls)
             elif to is Literal:
-                ret = value  # type: ignore
+                ret = cast(T, value)
             elif isinstance(value, to):
-                ret = value
+                ret = cast(T, value)
             else:
                 ret = Error(kls, value)
             return ret
@@ -53,7 +53,8 @@ def into(value: V, kls: Type[T]) -> Result[T]:
 
 
 def _is_sized_iterable(v: Any) -> bool:
-    return isinstance(v, Iterable) and isinstance(v, Sized)
+    return isinstance(v, Iterable) and isinstance(v, Sized)  # type: ignore
+    # bug: https://github.com/microsoft/pyright/issues/1856
 
 
 def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
@@ -65,11 +66,11 @@ def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
     if len(types) != len(val0):
         return Error(ty=kls, value=val0)
 
-    val1: Iterable = value  # type: ignore
-    ret = []
+    val1: Iterable[T] = value  # type: ignore
+    ret: List[T] = []
     for v, t in zip(val1, types):
         vr = into(v, t)  # type: ignore
-        if is_error(vr):
+        if isinstance(vr, Error):
             return vr
         ret.append(vr)
     ty_orig = get_origin(kls)
@@ -104,10 +105,10 @@ def _into_mono_container(value: V, kls: Type[T]) -> Result[T]:
     ty_item = get_args(kls)[0]
     ty_orig = get_origin(kls)
     assert ty_orig
-    ret = []
-    for v in value:  # type: ignore
-        w = into(v, ty_item)
-        if is_error(w):
+    ret: List[T] = []
+    for v in cast(Iterable[T], value):
+        w = into(v, ty_item)  # type: ignore
+        if isinstance(w, Error):
             return w
         ret.append(w)
     return ty_orig(ret)
@@ -143,9 +144,11 @@ def _into_dataclass(value: V, kls: Type[T]) -> Result[T]:
         return Error(value=value, ty=dict)
 
     # convert values into dastaclass recursively
-    d = dict()
-    fields: Dict[str, Type] = kls.__annotations__
+    d: Dict[str, Any] = dict()
+    fields: Dict[str, Type[Any]] = kls.__annotations__
     for k, v in value.items():
+        if not isinstance(k, str):
+            return Error(str, k)
         ty = fields[k]
         v = into(v, ty)
         if is_error(v):
