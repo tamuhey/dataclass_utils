@@ -14,7 +14,8 @@ commit = true
 files = [ "dataclass_utils/VERSION.py",]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
+typing-extensions = "^3.10.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"

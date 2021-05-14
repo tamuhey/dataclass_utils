@@ -8,9 +8,7 @@ from typing import (
     Dict,
     FrozenSet,
     List,
-    Literal,
     Optional,
-    OrderedDict,
     Set,
     Tuple,
     Type,
@@ -21,6 +19,7 @@ from typing import (
 import pytest
 
 from dataclass_utils import check_type
+from dataclass_utils.typing import Literal, OrderedDict
 
 from .utils import check
 
