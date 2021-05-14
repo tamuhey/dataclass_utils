@@ -1,10 +1,10 @@
-from typing import Dict, List
-import pytest
-from dataclasses import dataclass
-from dataclass_utils import check_type
 import sys
 
 if sys.version_info >= (3, 9):
+    from typing import Dict, List
+    import pytest
+    from dataclasses import dataclass
+    from dataclass_utils import check_type
 
     @dataclass
     class Foo:

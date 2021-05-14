@@ -1,9 +1,15 @@
 import dataclasses
-from typing import List, Literal, Optional, Tuple, Union
+import sys
+from typing import List, Optional, Tuple, Union
 
 import pytest
 
 from dataclass_utils import check_type, into
+
+if sys.version_info < (3, 8, 0):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 
 def test0():

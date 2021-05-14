@@ -1,10 +1,10 @@
 """Convert dict into dataclass"""
 
 import dataclasses
-from typing import Any, Dict, Iterable, List, Literal, Sized, Type, TypeVar, Union, cast
-import typing
+from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 
 from dataclass_utils.error import Error, type_error
+from dataclass_utils.typing import Literal, get_args, get_origin
 
 
 T = TypeVar("T")
@@ -28,26 +28,26 @@ def into(value: V, kls: Type[T]) -> Result[T]:
     if dataclasses.is_dataclass(kls):
         # dataclass
         return _into_dataclass(value, kls)
-    elif (to := typing.get_origin(kls)) is not None:
-        # generics
-        if to is list or to is set or to is frozenset:
-            ret = _into_mono_container(value, kls)
-        elif to is dict:
-            ret = _into_dict(value, kls)
-        elif to is tuple:
-            ret = _into_tuple(value, kls)
-        elif to is Union:
-            ret = _into_union(value, kls)
-        elif to is Literal:
-            ret = value  # type: ignore
-        else:
-            if isinstance(value, to):
+    else:
+        to = get_origin(kls)
+        if to is not None:
+            # generics
+            if to is list or to is set or to is frozenset:
+                ret = _into_mono_container(value, kls)
+            elif to is dict:
+                ret = _into_dict(value, kls)
+            elif to is tuple:
+                ret = _into_tuple(value, kls)
+            elif to is Union:
+                ret = _into_union(value, kls)
+            elif to is Literal:
+                ret = value  # type: ignore
+            elif isinstance(value, to):
                 ret = value
             else:
                 ret = Error(kls, value)
-        return ret
-    else:
-        if isinstance(value, kls):
+            return ret
+        elif isinstance(value, kls):
             return value
         return Error(kls, value)
 
@@ -60,7 +60,7 @@ def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
     if not _is_sized_iterable(value):
         return Error(kls, value)
 
-    types = typing.get_args(kls)
+    types = get_args(kls)
     val0: Sized = value  # type: ignore
     if len(types) != len(val0):
         return Error(ty=kls, value=val0)
@@ -72,7 +72,7 @@ def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
         if is_error(vr):
             return vr
         ret.append(vr)
-    ty_orig = typing.get_origin(kls)
+    ty_orig = get_origin(kls)
     assert ty_orig is not None
     return ty_orig(ret)
 
@@ -80,10 +80,10 @@ def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
 def _into_dict(value: V, kls: Type[T]) -> Result[T]:
     if not isinstance(value, dict):
         return Error(kls, value)
-    args = typing.get_args(kls)
+    args = get_args(kls)
     ty_key = args[0]
     ty_item = args[1]
-    orig = typing.get_origin(kls)
+    orig = get_origin(kls)
     assert orig is not None
     ret = orig()
     for k, v in value.items():
@@ -101,8 +101,8 @@ def _into_dict(value: V, kls: Type[T]) -> Result[T]:
 def _into_mono_container(value: V, kls: Type[T]) -> Result[T]:
     if not _is_sized_iterable(value):
         return Error(kls, value)
-    ty_item = typing.get_args(kls)[0]
-    ty_orig = typing.get_origin(kls)
+    ty_item = get_args(kls)[0]
+    ty_orig = get_origin(kls)
     assert ty_orig
     ret = []
     for v in value:  # type: ignore
@@ -114,7 +114,7 @@ def _into_mono_container(value: V, kls: Type[T]) -> Result[T]:
 
 
 def _into_union(value: V, kls: Type[T]) -> Result[T]:
-    types = typing.get_args(kls)
+    types = get_args(kls)
     err = Error(ty=kls, value=value)
     for ty in types:
         ret = into(value, ty)
