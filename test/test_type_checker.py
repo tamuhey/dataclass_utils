@@ -1,13 +1,19 @@
-from dataclass_utils.error import type_error
-from typing import Callable, Dict, Set
-from enum import Enum
-import pytest
-from dataclass_utils.type_checker import check_dataclass, is_error, check
 from dataclasses import dataclass, field
+from enum import Enum
+from typing import Callable, Dict, List, Set
+
+import pytest
+
+from dataclass_utils.error import type_error
+from dataclass_utils.type_checker import check, check_dataclass, is_error
 
 
 def test_set():
     assert is_error(check({"foo", "bar", 1}, Set[str]))
+
+
+def test_str():
+    assert is_error(check("foo", List[str]))
 
 
 def test_callable():

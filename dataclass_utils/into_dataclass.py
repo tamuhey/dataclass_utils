@@ -105,6 +105,8 @@ def _into_dict(value: V, kls: Type[T]) -> Result[T]:
 
 
 def _into_mono_container(value: V, kls: Type[T]) -> Result[T]:
+    if isinstance(value, str):
+        return Error(kls, value)
     if not _is_sized_iterable(value):
         return Error(kls, value)
     ty_item = get_args(kls)[0]

@@ -19,6 +19,11 @@ def test0():
     into(1, Literal[1])
 
 
+def test_str():
+    with pytest.raises(TypeError):
+        into("foo", List[str])
+
+
 def test_any():
     assert into(1, Any) == 1
 
