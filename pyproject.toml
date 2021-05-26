@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "dataclass_utils"
-version = "0.7.10"
+version = "0.7.11"
 description = ""
 authors = [ "Yohei Tamura <tamuhey@gmail.com>",]
 
