@@ -8,7 +8,7 @@ from dataclass_utils.typing import Literal, get_args, get_origin
 
 
 T = TypeVar("T")
-V = Union[Dict[Any, Any], List[Any], int, float, str, bool]
+V = Union[Dict[Any, Any], List[Any], int, float, str, bool, Any]
 
 Result = Union[T, Error]
 
@@ -41,7 +41,7 @@ def into(value: V, kls: Type[T]) -> Result[T]:
             elif to is Union:
                 ret = _into_union(value, kls)
             elif to is Literal:
-                ret = cast(T, value)
+                ret = _into_literal(value, kls)
             elif isinstance(value, to):
                 ret = cast(T, value)
             else:
@@ -55,6 +55,13 @@ def into(value: V, kls: Type[T]) -> Result[T]:
                 if kls is Any:
                     return value  # type: ignore
         return Error(kls, value)
+
+
+def _into_literal(value: V, kls: Type[T]) -> Result[T]:
+    literals = get_args(kls)
+    if value not in literals:
+        return Error(kls, value)
+    return value  # type: ignore
 
 
 def _is_sized_iterable(v: Any) -> bool:

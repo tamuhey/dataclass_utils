@@ -20,12 +20,23 @@ def test0():
 
 
 def test_literal():
+    into("a", Literal["a"])
+    into(1, Literal[1, 2])
+    into("b", Literal["a", "b", "c"])
     with pytest.raises(TypeError):
         into(1, Literal["a"])
+    with pytest.raises(TypeError):
+        into("c", Literal["a"])
+
     ty = Tuple[Literal["a", "b"], int]
+    into(("a", 10), ty)
     with pytest.raises(TypeError):
         into((1, 2), ty)
+    with pytest.raises(TypeError):
+        into(("c", 10), ty)
+
     ty = Optional[Tuple[Literal["a", "b"], int]]
+    into(None, ty)
     with pytest.raises(TypeError):
         into((1, 2), ty)
 
