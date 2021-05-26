@@ -19,6 +19,17 @@ def test0():
     into(1, Literal[1])
 
 
+def test_literal():
+    with pytest.raises(TypeError):
+        into(1, Literal["a"])
+    ty = Tuple[Literal["a", "b"], int]
+    with pytest.raises(TypeError):
+        into((1, 2), ty)
+    ty = Optional[Tuple[Literal["a", "b"], int]]
+    with pytest.raises(TypeError):
+        into((1, 2), ty)
+
+
 def test_str():
     with pytest.raises(TypeError):
         into("foo", List[str])
