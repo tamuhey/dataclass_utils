@@ -3,7 +3,7 @@
 import dataclasses
 from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 
-from dataclass_utils.error import Error
+from dataclass_utils.error import Error, MissingKeyError
 from dataclass_utils.typing import Literal, get_args, get_origin
 
 
@@ -163,6 +163,8 @@ def _into_dataclass(value: V, kls: Type[T]) -> Result[T]:
     for k, v in value.items():
         if not isinstance(k, str):
             return Error(str, k)
+        if k not in fields:
+            return MissingKeyError(kls, value, k)
         ty = fields[k]
         v = into(v, ty)
         if is_error(v):
