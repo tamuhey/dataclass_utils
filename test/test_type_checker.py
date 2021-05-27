@@ -2,9 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Callable, Dict, List, Set
 
-import pytest
 
-from dataclass_utils.error import type_error
 from dataclass_utils.type_checker import check, check_dataclass, is_error
 
 

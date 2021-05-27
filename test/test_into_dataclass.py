@@ -73,6 +73,11 @@ class A:
     b: List[str] = dataclasses.field(default_factory=list)
 
 
+def test_verb_key():
+    with pytest.raises(TypeError):
+        into({"c": 1}, A)
+
+
 def test_basic():
     d = {"a": 1, "b": ["foo", "bar"]}
     a = into(d, A)

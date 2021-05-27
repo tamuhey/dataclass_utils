@@ -3,7 +3,7 @@
 import dataclasses
 from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 
-from dataclass_utils.error import Error, type_error
+from dataclass_utils.error import Error
 from dataclass_utils.typing import Literal, get_args, get_origin
 
 
@@ -20,7 +20,7 @@ def is_error(v: Result[Any]) -> bool:
 def into_root(value: V, kls: Type[T]) -> T:
     ret = into(value, kls)
     if isinstance(ret, Error):
-        raise type_error(ret)
+        raise ret
     return ret
 
 

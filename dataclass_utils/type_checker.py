@@ -13,7 +13,7 @@ from typing import (
 )
 import typing
 
-from dataclass_utils.error import Error, type_error
+from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
 
 Result = Optional[Error]  # returns error context
@@ -56,31 +56,31 @@ def check(value: Any, ty: Type[Any]) -> Result:
             # concrete type
             if issubclass(ty, bool):
                 if not isinstance(value, ty):
-                    return Error(ty=ty, value=value)
+                    return Error0(ty=ty, value=value)
             elif issubclass(ty, int):  # For boolean
                 return check_int(value, ty)
             elif not isinstance(value, ty):
-                return Error(ty=ty, value=value)
+                return Error0(ty=ty, value=value)
 
     return None
 
 
 def check_int(value: Any, ty: Type[Any]) -> Result:
     if isinstance(value, bool) or not isinstance(value, ty):
-        return Error(ty=ty, value=value)
+        return Error0(ty=ty, value=value)
     return None
 
 
 def check_literal(value: Any, ty: Type[Any]) -> Result:
     if all(value != t for t in get_args(ty)):
-        return Error(ty=ty, value=value)
+        return Error0(ty=ty, value=value)
     return None
 
 
 def check_tuple(value: Any, ty: Type[Tuple[Any, ...]]) -> Result:
     types = get_args(ty)
     if len(value) != len(types):
-        return Error(ty=ty, value=value)
+        return Error0(ty=ty, value=value)
     for v, t in zip(value, types):
         err = check(v, t)
         if is_error(err):
@@ -91,7 +91,7 @@ def check_tuple(value: Any, ty: Type[Tuple[Any, ...]]) -> Result:
 def check_union(value: Any, ty: Type[Any]) -> Result:
     if any(not is_error(check(value, t)) for t in get_args(ty)):
         return None
-    return Error(ty=ty, value=value)
+    return Error0(ty=ty, value=value)
 
 
 def check_mono_container(
@@ -144,4 +144,4 @@ def check_root(value: Any):
     """Check dataclass type recursively"""
     err = check_dataclass(value, type(value))
     if err is not None:
-        raise type_error(err)
+        raise err
