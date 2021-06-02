@@ -122,7 +122,7 @@ def check_dict(value: Dict[Any, Any], ty: Type[Dict[Any, Any]]) -> Result:
 
 def check_dataclass(value: Any, ty: Type[Any]) -> Result:
     if not dataclasses.is_dataclass(value):
-        return Error(ty, value)
+        return Error0(ty, value)
     for k, ty in typing.get_type_hints(ty).items():
         v = getattr(value, k)
         err = check(v, ty)

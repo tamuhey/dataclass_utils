@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Callable, Dict, List, Set
 
-
+from dataclass_utils.error import Error
 from dataclass_utils.type_checker import check, check_dataclass, is_error
 
 
@@ -43,6 +43,11 @@ def test_error_dataclass():
     err = check_dataclass(a, A)
     assert is_error(err)
     assert "c" in err.path
+
+    err = check_dataclass("foo", A)
+    assert is_error(err)
+    assert str(err)
+    assert "a" in err.path
 
 
 def test_error_dict_value():

@@ -5,7 +5,6 @@ from typing import Any, List, Optional, Tuple, Union
 import pytest
 
 from dataclass_utils import check_type, into
-from dataclass_utils.error import Error
 
 if sys.version_info < (3, 8, 0):
     from typing_extensions import Literal

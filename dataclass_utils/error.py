@@ -1,13 +1,14 @@
 from typing import Any, List, Type
-import abc
 
 
 class Error(TypeError):
-    @abc.abstractmethod
     def __init__(self, ty: Type[Any], value: Any, path: List[str] = []):
         self.ty = ty
         self.value = value
         self.path = path
+
+    def __str__(self) -> str:
+        raise NotImplementedError()
 
 
 def _path_to_str(path: List[str]) -> str:
