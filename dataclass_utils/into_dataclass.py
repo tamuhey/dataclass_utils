@@ -1,6 +1,7 @@
 """Convert dict into dataclass"""
 
 import dataclasses
+import logging
 from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 
 from dataclass_utils.error import Error, Error0, MissingKeyError, UnsupportedTypeError
@@ -10,6 +11,7 @@ T = TypeVar("T")
 V = Union[Dict[Any, Any], List[Any], int, float, str, bool, Any]
 
 Result = Union[T, Error]
+logger = logging.getLogger(__name__)
 
 
 def is_error(v: Result[Any]) -> bool:
@@ -46,6 +48,11 @@ def into(value: V, kls: Type[T]) -> Result[T]:
             else:
                 ret = UnsupportedTypeError(kls, value)
             return ret
+        elif type(kls) == TypeVar:
+            logger.warning(
+                "Since TypeVar is not supported, the type is assumed to be `Type`"
+            )
+            return value  # type: ignore
         else:
             try:
                 if isinstance(value, kls):

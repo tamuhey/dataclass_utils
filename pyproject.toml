@@ -20,3 +20,4 @@ typing-extensions = "^3.10"
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
 mypy = "^0.800"
+isort = "^5.9.2"

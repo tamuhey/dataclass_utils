@@ -1,12 +1,10 @@
 import dataclasses
-import sys
 from test.utils import check_error
 from typing import Any, Generic, List, Optional, Tuple, TypeVar, Union
 
-import pytest
+from typing_extensions import Literal
 
 from dataclass_utils import check_type, into
-from typing_extensions import Literal
 
 
 def test0():
