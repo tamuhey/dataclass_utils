@@ -49,4 +49,5 @@ class UnsupportedTypeError(Error):
         self.path = path
 
     def __str__(self) -> str:
-        return f"UnsupportedType: {self.ty}"
+        path = _path_to_str(self.path)
+        return f"UnsupportedType in '{path}': {self.ty}"

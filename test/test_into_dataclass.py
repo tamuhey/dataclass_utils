@@ -1,16 +1,12 @@
 import dataclasses
 import sys
 from test.utils import check_error
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Generic, List, Optional, Tuple, TypeVar, Union
 
 import pytest
 
 from dataclass_utils import check_type, into
-
-if sys.version_info < (3, 8, 0):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 
 def test0():
@@ -120,4 +116,17 @@ def test_nest_tuple():
     with check_error():
         into({"a": (A(), B(1, A()))}, D)
     v = into({"a": ({}, {"a": 1, "b": {}})}, D)
+    check_type(v)
+
+
+T = TypeVar("T")
+
+
+@dataclasses.dataclass
+class Gen(Generic[T]):
+    a: T
+
+
+def test_typevar():
+    v: Gen[int] = into({"a": 1}, Gen)
     check_type(v)
