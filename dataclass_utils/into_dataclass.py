@@ -1,8 +1,8 @@
 """Convert dict into dataclass"""
 
 import dataclasses
-import logging
 import inspect
+import logging
 from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 
 from dataclass_utils.error import Error, Error0, MissingKeyError
@@ -72,7 +72,7 @@ def _is_class(value: Any) -> bool:
     return get_origin(value) is not None  # Generic alias
 
 
-def _into_type(value: Any, kls: Type[Type[T]]) -> Result[Type[T]]:
+def _into_type(value: Any, kls: Type[T]) -> Result[T]:
     err = Error0(kls, value)
     if not _is_class(value):
         return err
