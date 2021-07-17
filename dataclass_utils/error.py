@@ -39,7 +39,7 @@ class MissingKeyError(Error):
 
     def __str__(self):
         path = _path_to_str(self.path)
-        return f"Key Error in '{path}': Got '{self.key}' in 'self.value' but doesn't exist in '{self.ty}'"
+        return f"Key Error in '{path}': Got '{self.key}' in '{self.value}' but doesn't exist in '{self.ty}'"
 
 
 class UnsupportedTypeError(Error):
@@ -49,4 +49,5 @@ class UnsupportedTypeError(Error):
         self.path = path
 
     def __str__(self) -> str:
-        return f"UnsupportedType: {self.ty}"
+        path = _path_to_str(self.path)
+        return f"UnsupportedType in '{path}': {self.ty}"

@@ -1,15 +1,18 @@
 """Convert dict into dataclass"""
 
 import dataclasses
+import inspect
+import logging
 from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 
-from dataclass_utils.error import Error, Error0, MissingKeyError, UnsupportedTypeError
+from dataclass_utils.error import Error, Error0, MissingKeyError
 from dataclass_utils.typing import Literal, get_args, get_origin
 
 T = TypeVar("T")
 V = Union[Dict[Any, Any], List[Any], int, float, str, bool, Any]
 
 Result = Union[T, Error]
+logger = logging.getLogger(__name__)
 
 
 def is_error(v: Result[Any]) -> bool:
@@ -43,9 +46,16 @@ def into(value: V, kls: Type[T]) -> Result[T]:
                 ret = _into_literal(value, kls)
             elif isinstance(value, to):
                 ret = cast(T, value)
+            elif to == type:
+                ret = _into_type(value, kls)
             else:
-                ret = UnsupportedTypeError(kls, value)
+                ret = Error0(kls, value)
             return ret
+        elif type(kls) == TypeVar:
+            logger.warning(
+                "Since TypeVar is not supported, the type is assumed to be `Type`"
+            )
+            return value  # type: ignore
         else:
             try:
                 if isinstance(value, kls):
@@ -54,6 +64,31 @@ def into(value: V, kls: Type[T]) -> Result[T]:
                 if kls is Any:
                     return value  # type: ignore
         return Error0(kls, value)
+
+
+def _is_class(value: Any) -> bool:
+    if inspect.isclass(value):
+        return True
+    return get_origin(value) is not None  # Generic alias
+
+
+def _into_type(value: Any, kls: Type[T]) -> Result[T]:
+    err = Error0(kls, value)
+    if not _is_class(value):
+        return err
+    expected: Type[T] = get_args(kls)[0]
+    if expected == Any or isinstance(expected, TypeVar):
+        return value
+
+    expected_orig = get_origin(expected) or expected
+    expected_args = get_args(expected)
+    orig = get_origin(value) or value
+    args = get_args(value)
+    if expected_orig == orig and (
+        not expected_args or not args or expected_args == args
+    ):
+        return value
+    return err
 
 
 def _into_literal(value: V, kls: Type[T]) -> Result[T]:

@@ -1,16 +1,12 @@
+from dataclass_utils.error import Error, UnsupportedTypeError
 import dataclasses
-import sys
-from test.utils import check_error
-from typing import Any, List, Optional, Tuple, Union
-
 import pytest
+from test.utils import check_error
+from typing import Any, Generic, List, Optional, Set, Tuple, Type, TypeVar, Union
+
+from typing_extensions import Literal
 
 from dataclass_utils import check_type, into
-
-if sys.version_info < (3, 8, 0):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
 
 
 def test0():
@@ -121,3 +117,32 @@ def test_nest_tuple():
         into({"a": (A(), B(1, A()))}, D)
     v = into({"a": ({}, {"a": 1, "b": {}})}, D)
     check_type(v)
+
+
+T = TypeVar("T")
+
+
+@dataclasses.dataclass
+class Gen(Generic[T]):
+    a: T
+
+
+def test_typevar():
+    v: Gen[int] = into({"a": 1}, Gen)
+    check_type(v)
+
+
+def test_typevar_class():
+    into(int, Type[T])
+    into(List[str], Type[T])
+    with pytest.raises(Error):
+        into(List[int], Type[List[str]])
+    with pytest.raises(Error):
+        into(List[str], Type[Set[str]])
+    with pytest.raises(Error) as e:
+        into(1, Type[T])
+    assert e.type != UnsupportedTypeError
+
+
+def test_class():
+    into(int, Type[int])
