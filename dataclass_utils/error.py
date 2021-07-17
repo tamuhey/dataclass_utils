@@ -3,6 +3,10 @@ from typing import Any, List, Type
 
 class Error(TypeError):
     def __init__(self, ty: Type[Any], value: Any, path: List[str] = []):
+        if type(self) == Error:
+            raise ValueError(
+                "Internal Error: `Error` must not be instantiated directly"
+            )
         self.ty = ty
         self.value = value
         self.path = path
@@ -36,3 +40,13 @@ class MissingKeyError(Error):
     def __str__(self):
         path = _path_to_str(self.path)
         return f"Key Error in '{path}': Got '{self.key}' in 'self.value' but doesn't exist in '{self.ty}'"
+
+
+class UnsupportedTypeError(Error):
+    def __init__(self, ty: Type[Any], value: Any, path: List[str] = []):
+        self.ty = ty
+        self.value = value
+        self.path = path
+
+    def __str__(self) -> str:
+        return f"UnsupportedType: {self.ty}"

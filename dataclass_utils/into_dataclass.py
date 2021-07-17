@@ -3,7 +3,7 @@
 import dataclasses
 from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 
-from dataclass_utils.error import Error, MissingKeyError
+from dataclass_utils.error import Error, Error0, MissingKeyError, UnsupportedTypeError
 from dataclass_utils.typing import Literal, get_args, get_origin
 
 
@@ -45,7 +45,7 @@ def into(value: V, kls: Type[T]) -> Result[T]:
             elif isinstance(value, to):
                 ret = cast(T, value)
             else:
-                ret = Error(kls, value)
+                ret = UnsupportedTypeError(kls, value)
             return ret
         else:
             try:
@@ -54,13 +54,13 @@ def into(value: V, kls: Type[T]) -> Result[T]:
             except TypeError:
                 if kls is Any:
                     return value  # type: ignore
-        return Error(kls, value)
+        return Error0(kls, value)
 
 
 def _into_literal(value: V, kls: Type[T]) -> Result[T]:
     literals = get_args(kls)
     if value not in literals:
-        return Error(kls, value)
+        return Error0(kls, value)
     return value  # type: ignore
 
 
@@ -71,12 +71,12 @@ def _is_sized_iterable(v: Any) -> bool:
 
 def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
     if not _is_sized_iterable(value):
-        return Error(kls, value)
+        return Error0(kls, value)
 
     types = get_args(kls)
     val0: Sized = value  # type: ignore
     if len(types) != len(val0):
-        return Error(ty=kls, value=val0)
+        return Error0(ty=kls, value=val0)
 
     val1: Iterable[T] = value  # type: ignore
     ret: List[T] = []
@@ -92,7 +92,7 @@ def _into_tuple(value: V, kls: Type[T]) -> Result[T]:
 
 def _into_dict(value: V, kls: Type[T]) -> Result[T]:
     if not isinstance(value, dict):
-        return Error(kls, value)
+        return Error0(kls, value)
     args = get_args(kls)
     ty_key = args[0]
     ty_item = args[1]
@@ -113,9 +113,9 @@ def _into_dict(value: V, kls: Type[T]) -> Result[T]:
 
 def _into_mono_container(value: V, kls: Type[T]) -> Result[T]:
     if isinstance(value, str):
-        return Error(kls, value)
+        return Error0(kls, value)
     if not _is_sized_iterable(value):
-        return Error(kls, value)
+        return Error0(kls, value)
     ty_item = get_args(kls)[0]
     ty_orig = get_origin(kls)
     assert ty_orig
@@ -130,7 +130,7 @@ def _into_mono_container(value: V, kls: Type[T]) -> Result[T]:
 
 def _into_union(value: V, kls: Type[T]) -> Result[T]:
     types = get_args(kls)
-    err = Error(ty=kls, value=value)
+    err = Error0(ty=kls, value=value)
     for ty in types:
         ret = into(value, ty)
         if not is_error(ret):
@@ -155,14 +155,14 @@ def _into_dataclass(value: V, kls: Type[T]) -> Result[T]:
     >>> assert bar.foo == Foo(**data["foo"]) # field `foo` is instantiated as `Foo`, not dict
     """
     if not isinstance(value, dict):
-        return Error(value=value, ty=dict)
+        return Error0(value=value, ty=dict)
 
     # convert values into dastaclass recursively
     d: Dict[str, Any] = dict()
     fields: Dict[str, Type[Any]] = kls.__annotations__
     for k, v in value.items():
         if not isinstance(k, str):
-            return Error(str, k)
+            return Error0(str, k)
         if k not in fields:
             return MissingKeyError(kls, value, k)
         ty = fields[k]
@@ -174,4 +174,4 @@ def _into_dataclass(value: V, kls: Type[T]) -> Result[T]:
     try:
         return kls(**d)  # type: ignore
     except:
-        return Error(kls, value)
+        return Error0(kls, value)
