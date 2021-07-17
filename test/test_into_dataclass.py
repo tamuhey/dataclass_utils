@@ -1,6 +1,6 @@
 import dataclasses
 from test.utils import check_error
-from typing import Any, Generic, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from typing_extensions import Literal
 
@@ -128,3 +128,7 @@ class Gen(Generic[T]):
 def test_typevar():
     v: Gen[int] = into({"a": 1}, Gen)
     check_type(v)
+
+
+def test_typevar_class():
+    into(1, Type[T])
