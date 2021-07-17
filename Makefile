@@ -1,4 +1,4 @@
-.PHONY: lint test exapmle
+.PHONY: lint test exapmle publish
 
 MODULE="dataclass_utils"
 lint:
