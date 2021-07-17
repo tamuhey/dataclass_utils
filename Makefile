@@ -15,6 +15,6 @@ run_example:
 	poetry run mypy dataclass_utils
 
 publish: lint test
-	git diff --exit-code || echo "\ncommit changes before publishing!!!\n" && exit 1
+	git diff --exit-code # check working directory is clean
 	poetry run pytest test
 	poetry publish --build
