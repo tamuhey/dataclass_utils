@@ -16,5 +16,4 @@ run_example:
 
 publish: lint test
 	git diff --exit-code # check working directory is clean
-	poetry run pytest test
 	poetry publish --build
