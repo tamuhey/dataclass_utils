@@ -6,7 +6,6 @@ from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 from dataclass_utils.error import Error, Error0, MissingKeyError, UnsupportedTypeError
 from dataclass_utils.typing import Literal, get_args, get_origin
 
-
 T = TypeVar("T")
 V = Union[Dict[Any, Any], List[Any], int, float, str, bool, Any]
 

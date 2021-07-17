@@ -14,3 +14,7 @@ run_example:
 	ls examples/*py | xargs poetry run python
 	poetry run mypy dataclass_utils
 
+publish: lint test
+	git diff --exit-code || echo "\ncommit changes before publishing!!!\n" && exit 1
+	poetry run pytest test
+	poetry publish --build

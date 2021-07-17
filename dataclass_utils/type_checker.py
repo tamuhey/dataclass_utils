@@ -1,4 +1,5 @@
 import dataclasses
+import typing
 from typing import (
     Any,
     Dict,
@@ -11,7 +12,6 @@ from typing import (
     TypeVar,
     Union,
 )
-import typing
 
 from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
