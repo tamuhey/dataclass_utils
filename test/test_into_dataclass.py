@@ -1,4 +1,6 @@
+from dataclass_utils.error import Error, UnsupportedTypeError
 import dataclasses
+import pytest
 from test.utils import check_error
 from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
@@ -131,4 +133,11 @@ def test_typevar():
 
 
 def test_typevar_class():
-    into(1, Type[T])
+    into(int, Type[T])
+    with pytest.raises(Error) as e:
+        into(1, Type[T])
+    assert e.type != UnsupportedTypeError
+
+
+def test_class():
+    into(int, Type[int])

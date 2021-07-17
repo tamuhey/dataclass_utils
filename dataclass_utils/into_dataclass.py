@@ -46,7 +46,7 @@ def into(value: V, kls: Type[T]) -> Result[T]:
             elif isinstance(value, to):
                 ret = cast(T, value)
             else:
-                ret = UnsupportedTypeError(kls, value)
+                ret = Error0(kls, value)
             return ret
         elif type(kls) == TypeVar:
             logger.warning(
