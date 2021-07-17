@@ -1,5 +1,6 @@
 import dataclasses
 import sys
+from test.utils import check_error
 from typing import Any, List, Optional, Tuple, Union
 
 import pytest
@@ -22,26 +23,26 @@ def test_literal():
     into("a", Literal["a"])
     into(1, Literal[1, 2])
     into("b", Literal["a", "b", "c"])
-    with pytest.raises(TypeError):
+    with check_error():
         into(1, Literal["a"])
-    with pytest.raises(TypeError):
+    with check_error():
         into("c", Literal["a"])
 
     ty = Tuple[Literal["a", "b"], int]
     into(("a", 10), ty)
-    with pytest.raises(TypeError):
+    with check_error():
         into((1, 2), ty)
-    with pytest.raises(TypeError):
+    with check_error():
         into(("c", 10), ty)
 
     ty = Optional[Tuple[Literal["a", "b"], int]]
     into(None, ty)
-    with pytest.raises(TypeError):
+    with check_error():
         into((1, 2), ty)
 
 
 def test_str():
-    with pytest.raises(TypeError):
+    with check_error():
         into("foo", List[str])
 
 
@@ -56,7 +57,7 @@ class A0:
 
 def test_invalid_dict():
     d = {"a": 1, 1: 2}
-    with pytest.raises(TypeError):
+    with check_error():
         into(d, A0)
 
 
@@ -73,7 +74,7 @@ class A:
 
 
 def test_verb_key():
-    with pytest.raises(TypeError):
+    with check_error():
         into({"c": 1}, A)
 
 
@@ -116,7 +117,7 @@ class D:
 
 
 def test_nest_tuple():
-    with pytest.raises(TypeError):
+    with check_error():
         into({"a": (A(), B(1, A()))}, D)
     v = into({"a": ({}, {"a": 1, "b": {}})}, D)
     check_type(v)
