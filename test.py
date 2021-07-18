@@ -1,9 +1,13 @@
 import asyncio
+from asyncio.subprocess import PIPE, Process
 import logging
 import pystructopt
 from dataclasses import dataclass
 from typing import Union
 from typing_extensions import Literal, TypeGuard, get_args
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 T_PYTHON_VERSIONS = Literal["3.7", "3.8", "3.9", "3.10-rc"]
@@ -35,18 +39,29 @@ async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
     tag = f"dataclass_utils_{python_version}"
     if not no_build:
         cmd = f"docker build -t {tag} --build-arg PYTHON_VERSION={python_version} ."
-        print("Build")
-        print(cmd)
-        proc = await asyncio.create_subprocess_shell(cmd)
+        logger.info("Build")
+        logger.info(cmd)
+        proc = await asyncio.create_subprocess_exec(
+            *cmd.split(), stdout=PIPE, stderr=PIPE
+        )
         ret = await proc.wait()
         if ret != 0:
             raise ValueError(cmd)
+        await printout(proc)
 
     test_cmd = f"docker run -it --rm {tag} make test"
-    proc = await asyncio.create_subprocess_shell(test_cmd)
+    proc = await asyncio.create_subprocess_exec(
+        *test_cmd.split(), stdout=PIPE, stderr=PIPE
+    )
     ret = await proc.wait()
     if ret != 0:
         raise ValueError(test_cmd)
+    await printout(proc)
+
+
+async def printout(proc: Process):
+    if proc.stdout:
+        logger.info((await proc.stdout.read()).decode())
 
 
 if __name__ == "__main__":
