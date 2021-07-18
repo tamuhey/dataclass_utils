@@ -127,11 +127,13 @@ class Gen(Generic[T]):
     a: T
 
 
+@pytest.mark.skip(reason="not supported yet")
 def test_typevar():
     v: Gen[int] = into({"a": 1}, Gen)
     check_type(v)
 
 
+@pytest.mark.skip(reason="not supported yet")
 def test_typevar_class():
     into(int, Type[T])
     into(List[str], Type[T])
