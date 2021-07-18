@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 from asyncio.subprocess import PIPE, Process
 import logging
 import pystructopt
@@ -36,7 +37,8 @@ def is_python_version(version: str) -> TypeGuard[T_PYTHON_VERSIONS]:
 
 
 async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
-    tag = f"dataclass_utils_{python_version}"
+    mod = Path(__file__).parent.absolute().parts[-1]
+    tag = f"{mod}_{python_version}"
     if not no_build:
         cmd = f"docker build -t {tag} --build-arg PYTHON_VERSION={python_version} ."
         logger.info("Build")
