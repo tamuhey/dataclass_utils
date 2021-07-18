@@ -43,21 +43,15 @@ async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
         cmd = f"docker build -t {tag} --build-arg PYTHON_VERSION={python_version} ."
         logger.info("Build")
         logger.info(cmd)
-        proc = await asyncio.create_subprocess_exec(
-            *cmd.split(), stdout=PIPE, stderr=PIPE
-        )
-        stdout, _ = await proc.communicate()
-        #  logger.info(stdout.decode())
-        if proc.returncode != 0:
+        proc = await asyncio.create_subprocess_exec(*cmd.split())
+        if await proc.wait() != 0:
             raise ValueError(cmd)
 
     test_cmd = f"docker run -it --rm {tag} make test"
     proc = await asyncio.create_subprocess_exec(
         *test_cmd.split(), stdout=PIPE, stderr=PIPE
     )
-    stdout, _ = await proc.communicate()
-    #  logger.info(stdout.decode())
-    if proc.returncode != 0:
+    if await proc.wait() != 0:
         raise ValueError(test_cmd)
 
 
