@@ -10,6 +10,9 @@ lint:
 test: run_example
 	poetry run pytest
 
+test_all:
+	python test.py all
+
 run_example:
 	ls examples/*py | xargs poetry run python
 	poetry run mypy dataclass_utils
