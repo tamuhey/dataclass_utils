@@ -47,7 +47,7 @@ async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
             *cmd.split(), stdout=PIPE, stderr=PIPE
         )
         stdout, _ = await proc.communicate()
-        logger.info(stdout.decode())
+        #  logger.info(stdout.decode())
         if proc.returncode != 0:
             raise ValueError(cmd)
 
@@ -56,11 +56,12 @@ async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
         *test_cmd.split(), stdout=PIPE, stderr=PIPE
     )
     stdout, _ = await proc.communicate()
-    logger.info(stdout.decode())
+    #  logger.info(stdout.decode())
     if proc.returncode != 0:
         raise ValueError(test_cmd)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
+
     asyncio.run(main())
