@@ -146,3 +146,4 @@ def test_typevar_class():
 
 def test_class():
     into(int, Type[int])
+    into(None, None)

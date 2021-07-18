@@ -66,29 +66,13 @@ def into(value: V, kls: Type[T]) -> Result[T]:
         return Error0(kls, value)
 
 
-def _is_class(value: Any) -> bool:
-    if inspect.isclass(value):
-        return True
-    return get_origin(value) is not None  # Generic alias
-
-
 def _into_type(value: Any, kls: Type[T]) -> Result[T]:
-    err = Error0(kls, value)
-    if not _is_class(value):
-        return err
-    expected: Type[T] = get_args(kls)[0]
-    if expected == Any or isinstance(expected, TypeVar):
-        return value
-
-    expected_orig = get_origin(expected) or expected
-    expected_args = get_args(expected)
-    orig = get_origin(value) or value
-    args = get_args(value)
-    if expected_orig == orig and (
-        not expected_args or not args or expected_args == args
-    ):
-        return value
-    return err
+    logger.warning(f"Checking {kls} is not supported.")
+    # There are many difficult cases in there, for example:
+    # - None
+    # - List == list
+    # For now, I don't validate `value` and pass it.
+    return value
 
 
 def _into_literal(value: V, kls: Type[T]) -> Result[T]:
