@@ -46,24 +46,19 @@ async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
         proc = await asyncio.create_subprocess_exec(
             *cmd.split(), stdout=PIPE, stderr=PIPE
         )
-        ret = await proc.wait()
-        if ret != 0:
+        stdout, _ = await proc.communicate()
+        logger.info(stdout.decode())
+        if proc.returncode != 0:
             raise ValueError(cmd)
-        await printout(proc)
 
     test_cmd = f"docker run -it --rm {tag} make test"
     proc = await asyncio.create_subprocess_exec(
         *test_cmd.split(), stdout=PIPE, stderr=PIPE
     )
-    ret = await proc.wait()
-    if ret != 0:
+    stdout, _ = await proc.communicate()
+    logger.info(stdout.decode())
+    if proc.returncode != 0:
         raise ValueError(test_cmd)
-    await printout(proc)
-
-
-async def printout(proc: Process):
-    if proc.stdout:
-        logger.info((await proc.stdout.read()).decode())
 
 
 if __name__ == "__main__":
