@@ -1,4 +1,6 @@
 import asyncio
+import pystructopt
+from dataclasses import dataclass
 from typing import Union
 from typing_extensions import Literal, TypeGuard, get_args
 import itertools
@@ -9,15 +11,21 @@ T_PYTHON_VERSIONS = Literal["3.7", "3.8", "3.9", "3.10-rc"]
 PYTHON_VERSIONS = set(get_args(T_PYTHON_VERSIONS))
 
 
-def main(python_version: str, no_build: bool = False):
-    if is_python_version(python_version):
-        asyncio.run(run(python_version, no_build))
-    elif python_version == "all":
-        tasks = [run(v, no_build) for v in PYTHON_VERSIONS]
+@dataclass
+class Opts:
+    python_version: Union[T_PYTHON_VERSIONS, Literal["all"]]
+    no_build: bool = False
+
+
+def main():
+    opts = pystructopt.parse(Opts)
+    if is_python_version(opts.python_version):
+        asyncio.run(run(opts.python_version, opts.no_build))
+    elif opts.python_version == "all":
+        tasks = [run(v, opts.no_build) for v in PYTHON_VERSIONS]
         asyncio.run(asyncio.gather(*tasks))
     else:
-        print(type(python_version))
-        raise ValueError(f"Invalid python_version argument: {python_version}")
+        raise ValueError(f"Invalid python_version argument: {opts.python_version}")
 
 
 def is_python_version(version: str) -> TypeGuard[T_PYTHON_VERSIONS]:
@@ -40,5 +48,4 @@ async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
 
 
 if __name__ == "__main__":
-    parser = Argument
-    fire.Fire(main)
+    main()
