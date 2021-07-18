@@ -1,7 +1,7 @@
 from dataclass_utils.error import Error, UnsupportedTypeError
 import dataclasses
 import pytest
-from test.utils import check_error
+from tests.utils import check_error
 from typing import Any, Generic, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 from typing_extensions import Literal

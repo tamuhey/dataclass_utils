@@ -1,7 +1,6 @@
 """Convert dict into dataclass"""
 
 import dataclasses
-import inspect
 import logging
 from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 
