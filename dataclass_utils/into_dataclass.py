@@ -56,6 +56,9 @@ def into(value: V, kls: Type[T]) -> Result[T]:
                 "Since TypeVar is not supported, the type is assumed to be `Type`"
             )
             return value  # type: ignore
+        elif kls is None:
+            if value is None:
+                return value
         else:
             try:
                 if isinstance(value, kls):
