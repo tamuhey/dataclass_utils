@@ -16,13 +16,13 @@ class Opts:
     no_build: bool = False
 
 
-def main():
+async def main():
     opts = pystructopt.parse(Opts)
     if is_python_version(opts.python_version):
-        asyncio.run(run(opts.python_version, opts.no_build))
+        await run(opts.python_version, opts.no_build)
     elif opts.python_version == "all":
         tasks = [run(v, opts.no_build) for v in PYTHON_VERSIONS]
-        asyncio.run(asyncio.gather(*tasks))
+        await asyncio.gather(*tasks)
     else:
         raise ValueError(f"Invalid python_version argument: {opts.python_version}")
 
@@ -39,13 +39,16 @@ async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
         print(cmd)
         proc = await asyncio.create_subprocess_shell(cmd)
         ret = await proc.wait()
-        print(ret)
+        if ret != 0:
+            raise ValueError(cmd)
+
     test_cmd = f"docker run -it --rm {tag} make test"
     proc = await asyncio.create_subprocess_shell(test_cmd)
     ret = await proc.wait()
-    print(ret)
+    if ret != 0:
+        raise ValueError(test_cmd)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    main()
+    asyncio.run(main())

@@ -140,3 +140,4 @@ dmypy.json
 cython_debug/
 /.venv36
 /.venv37
+poetry.lock

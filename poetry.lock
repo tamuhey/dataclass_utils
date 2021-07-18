@@ -134,19 +134,15 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "pystructopt"
-version = "0.1.0"
+version = "0.1.2"
 description = ""
 category = "dev"
 optional = false
-python-versions = "^3.7"
-develop = true
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
 dataclass-utils = ">=0.7.14,<1"
-
-[package.source]
-type = "directory"
-url = "../pystructopt"
+typing-extensions = ">=3.10.0,<4.0.0"
 
 [[package]]
 name = "pytest"
@@ -209,7 +205,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "51df06506a1511ab22aa934ddd291be4145da719ead55b61a3cb9004e64abf73"
+content-hash = "9d75cea6ea82c90f76c154694d2d9d12e60be2e40c1030e770490297d192a3c3"
 
 [metadata.files]
 atomicwrites = [
@@ -280,7 +276,10 @@ pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
     {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
 ]
-pystructopt = []
+pystructopt = [
+    {file = "pystructopt-0.1.2-py3-none-any.whl", hash = "sha256:4dbaabb4e00b10c5c056fb85b505df847134e058aaa1b5cd58de90eb0df74c66"},
+    {file = "pystructopt-0.1.2.tar.gz", hash = "sha256:b4936c655220d9aedabd805a243240a9ac00dd5d64593de3b193e619b0be1dfe"},
+]
 pytest = [
     {file = "pytest-6.2.4-py3-none-any.whl", hash = "sha256:91ef2131a9bd6be8f76f1f08eac5c5317221d6ad1e143ae03894b862e8976890"},
     {file = "pytest-6.2.4.tar.gz", hash = "sha256:50bcad0a0b9c5a72c8e4e7c9855a3ad496ca6a881a3641b4260605450772c54b"},
