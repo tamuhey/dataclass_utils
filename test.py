@@ -1,10 +1,9 @@
 import asyncio
+import logging
 import pystructopt
 from dataclasses import dataclass
 from typing import Union
 from typing_extensions import Literal, TypeGuard, get_args
-import itertools
-import subprocess
 
 
 T_PYTHON_VERSIONS = Literal["3.7", "3.8", "3.9", "3.10-rc"]
@@ -48,4 +47,5 @@ async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()

@@ -193,5 +193,5 @@ def _into_dataclass(value: V, kls: Type[T]) -> Result[T]:
         d[k] = v
     try:
         return kls(**d)  # type: ignore
-    except:
-        return Error0(kls, value)
+    except Exception as e:
+        return Error0(kls, value, exception=e)

@@ -1,4 +1,4 @@
-from typing import Any, List, Type
+from typing import Any, List, Optional, Type
 
 
 class Error(TypeError):
@@ -20,14 +20,24 @@ def _path_to_str(path: List[str]) -> str:
 
 
 class Error0(Error):
-    def __init__(self, ty: Type[Any], value: Any, path: List[str] = []):
+    def __init__(
+        self,
+        ty: Type[Any],
+        value: Any,
+        path: List[str] = [],
+        exception: Optional[Any] = None,
+    ):
         self.ty = ty
         self.value = value
         self.path = path
+        self.exception = exception
 
     def __str__(self):
         path = _path_to_str(self.path)
-        return f"Error in field '{path}'. Expected type {self.ty}, got {type(self.value)} (value: {self.value})"
+        msg = f"Error in field '{path}'. Expected type {self.ty}, got {type(self.value)} (value: {self.value})"
+        if self.exception is not None:
+            msg += f"\n{type(self.exception)}: {self.exception}"
+        return msg
 
 
 class MissingKeyError(Error):
