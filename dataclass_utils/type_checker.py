@@ -13,7 +13,7 @@ from typing import (
     Union,
 )
 
-from typing_extensions import _TypedDictMeta  # type: ignore
+from typing_extensions import TypeGuard, TypedDict, _TypedDictMeta  # type: ignore
 from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
 
@@ -136,11 +136,17 @@ def check_dataclass(value: Any, ty: Type[Any]) -> Result:
     return None
 
 
-def check_typeddict(value: Any, ty: Type[Any]) -> Result:
+def check_typeddict(value: Any, ty: Type[TypedDict]) -> Result:
     if not isinstance(value, dict):
         return Error0(ty, value)
+    is_total: bool = ty.__total__  # type: ignore
     for k, ty in typing.get_type_hints(ty).items():
-        v: Optional[ty] = value.get(k, None)  # type: ignore
+        if k not in value:
+            if is_total:
+                return Error0(ty, value, [k])
+            else:
+                continue
+        v: "ty" = value[k]
         err = check(v, ty)
         if err is not None:
             err.path.append(k)
@@ -148,15 +154,15 @@ def check_typeddict(value: Any, ty: Type[Any]) -> Result:
     return None
 
 
-def is_typevar(ty: Type[Any]) -> bool:
+def is_typevar(ty: Type[Any]) -> TypeGuard[TypeVar]:
     return isinstance(ty, TypeVar)
 
 
-def is_error(ret: Result) -> bool:
+def is_error(ret: Result) -> TypeGuard[Error]:
     return ret is not None
 
 
-def is_typeddict(ty: Type[Any]) -> bool:
+def is_typeddict(ty: Type[Any]) -> TypeGuard[Type[TypedDict]]:
     # TODO: Should use `typing.is_typeddict` in future
     #       or, use publich API
     return isinstance(ty, _TypedDictMeta)

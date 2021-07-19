@@ -1,3 +1,4 @@
+import pytest
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Callable, Dict, List, Optional, Set
@@ -91,6 +92,48 @@ class TD(TypedDict):
     c: Optional["TD"]
 
 
-def test_typeddict():
-    v = {"a": "foo", "b": 1, "c": None}
-    assert not is_error(check(v, TD))
+class TDPartial(TypedDict, total=False):
+    a: str
+    b: int
+    c: Optional["TDPartial"]
+
+
+@pytest.mark.parametrize(
+    "ty,value",
+    [
+        (TD, {"a": "foo", "b": 1, "c": None}),
+        (TDPartial, {"a": "foo"}),
+        (TDPartial, {}),
+        (TDPartial, {"c": {"c": {"c": {"c": {"c": {}}}}}}),
+        (
+            TD,
+            {
+                "a": "foo",
+                "b": 1,
+                "c": {"a": "bar", "b": 1, "c": {"a": "foo", "b": 2, "c": None}},
+            },
+        ),
+    ],
+)
+def test_typeddict(ty, value):
+    assert not is_error(check(value, ty))
+
+
+@pytest.mark.parametrize(
+    "ty,value",
+    [
+        (TD, {"a": "foo", "b": 1}),
+        (TD, {"a": 1}),
+        (TDPartial, {"c": {"c": {"c": {"c": {"c": {"a": 10}}}}}}),
+        (
+            TD,
+            {
+                "a": "foo",
+                "b": 1,
+                "c": {"a": "bar", "b": 1, "c": {"a": 1, "b": 2, "c": None}},
+            },
+        ),
+    ],
+)
+def test_typeddict_error(ty, value):
+    assert is_error(check(value, ty))
