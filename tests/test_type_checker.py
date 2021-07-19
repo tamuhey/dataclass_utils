@@ -1,10 +1,11 @@
 import pytest
+import sys
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Callable, Dict, List, Optional, Set
 from typing_extensions import TypedDict
 
-from dataclass_utils.type_checker import check, check_dataclass, is_error
+from dataclass_utils.type_checker import check, check_dataclass, is_error, is_typeddict
 
 
 def test_set():
@@ -98,9 +99,15 @@ class TDPartial(TypedDict, total=False):
     c: Optional["TDPartial"]
 
 
+class TDList(TypedDict):
+    a: int
+    b: List[TDPartial]
+
+
 @pytest.mark.parametrize(
     "ty,value",
     [
+        (TDList, {"a": 1, "b": [{"a": "1"}]}),
         (TD, {"a": "foo", "b": 1, "c": None}),
         (TDPartial, {"a": "foo"}),
         (TDPartial, {}),
@@ -137,3 +144,13 @@ def test_typeddict(ty, value):
 )
 def test_typeddict_error(ty, value):
     assert is_error(check(value, ty))
+
+
+if sys.version_info >= (3, 8, 0):
+    import typing
+
+    class XTD(typing.TypedDict):
+        a: int
+
+    def test_is_typeddict():
+        assert is_typeddict(XTD)

@@ -1,3 +1,4 @@
+import sys
 import dataclasses
 import typing
 from typing import (
@@ -14,11 +15,11 @@ from typing import (
 )
 
 from typing_extensions import TypedDict, TypeGuard
+import typing_extensions
 
 from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
 
-from .typing import _TypedDictMeta
 
 Result = Optional[Error]  # returns error context
 
@@ -168,7 +169,11 @@ def is_error(ret: Result) -> TypeGuard[Error]:
 def is_typeddict(ty: Type[Any]) -> TypeGuard[Type[TypedDict]]:  # type: ignore
     # TODO: Should use `typing.is_typeddict` in future
     #       or, use publich API
-    return isinstance(ty, _TypedDictMeta)
+    T = "_TypedDictMeta"
+    for mod in [typing, typing_extensions]:
+        if hasattr(mod, T) and isinstance(ty, getattr(mod, T)):
+            return True
+    return False
 
 
 def check_root(value: Any):
