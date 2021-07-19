@@ -13,6 +13,7 @@ from typing import (
     Union,
 )
 
+from typing_extensions import _TypedDictMeta  # type: ignore
 from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
 
@@ -33,6 +34,9 @@ def check(value: Any, ty: Type[Any]) -> Result:
     if not isinstance(value, type) and dataclasses.is_dataclass(ty):
         # dataclass
         return check_dataclass(value, ty)
+    elif is_typeddict(ty):
+        # should use `typing.is_typeddict` in future
+        return check_typeddict(value, ty)
     else:
         to = get_origin(ty)
         if to is not None:
@@ -132,12 +136,30 @@ def check_dataclass(value: Any, ty: Type[Any]) -> Result:
     return None
 
 
+def check_typeddict(value: Any, ty: Type[Any]) -> Result:
+    if not isinstance(value, dict):
+        return Error0(ty, value)
+    for k, ty in typing.get_type_hints(ty).items():
+        v: Optional[ty] = value.get(k, None)  # type: ignore
+        err = check(v, ty)
+        if err is not None:
+            err.path.append(k)
+            return err
+    return None
+
+
 def is_typevar(ty: Type[Any]) -> bool:
     return isinstance(ty, TypeVar)
 
 
 def is_error(ret: Result) -> bool:
     return ret is not None
+
+
+def is_typeddict(ty: Type[Any]) -> bool:
+    # TODO: Should use `typing.is_typeddict` in future
+    #       or, use publich API
+    return isinstance(ty, _TypedDictMeta)
 
 
 def check_root(value: Any):

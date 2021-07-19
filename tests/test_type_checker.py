@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, Dict, List, Optional, Set, TypedDict
+from typing import Callable, Dict, List, Optional, Set
+from typing_extensions import TypedDict
 
 from dataclass_utils.type_checker import check, check_dataclass, is_error
 
