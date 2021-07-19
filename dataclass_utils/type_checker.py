@@ -13,7 +13,8 @@ from typing import (
     Union,
 )
 
-from typing_extensions import TypeGuard, TypedDict, _TypedDictMeta  # type: ignore
+from typing_extensions import TypeGuard, TypedDict
+from .typing import _TypedDictMeta
 from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
 
@@ -136,7 +137,7 @@ def check_dataclass(value: Any, ty: Type[Any]) -> Result:
     return None
 
 
-def check_typeddict(value: Any, ty: Type[TypedDict]) -> Result:
+def check_typeddict(value: Any, ty: Type[Type[Any]]) -> Result:
     if not isinstance(value, dict):
         return Error0(ty, value)
     is_total: bool = ty.__total__  # type: ignore
@@ -146,7 +147,7 @@ def check_typeddict(value: Any, ty: Type[TypedDict]) -> Result:
                 return Error0(ty, value, [k])
             else:
                 continue
-        v: "ty" = value[k]
+        v = value[k]
         err = check(v, ty)
         if err is not None:
             err.path.append(k)
@@ -162,7 +163,7 @@ def is_error(ret: Result) -> TypeGuard[Error]:
     return ret is not None
 
 
-def is_typeddict(ty: Type[Any]) -> TypeGuard[Type[TypedDict]]:
+def is_typeddict(ty: Type[Any]) -> TypeGuard[Type[TypedDict]]:  # type: ignore
     # TODO: Should use `typing.is_typeddict` in future
     #       or, use publich API
     return isinstance(ty, _TypedDictMeta)
