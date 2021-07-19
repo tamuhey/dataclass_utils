@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, Dict, List, Set
+from typing import Callable, Dict, List, Optional, Set, TypedDict
 
 from dataclass_utils.type_checker import check, check_dataclass, is_error
 
@@ -82,3 +82,14 @@ class ENUM(Enum):
 def test_enum():
     assert is_error(check("a", ENUM))
     assert not is_error(check(ENUM.a, ENUM))
+
+
+class TD(TypedDict):
+    a: str
+    b: int
+    c: Optional["TD"]
+
+
+def test_typeddict():
+    v = {"a": "foo", "b": 1, "c": None}
+    assert not is_error(check(v, TD))
