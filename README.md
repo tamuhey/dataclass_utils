@@ -33,3 +33,7 @@ See [examples](./examples) directory for more examples.
 - Recursively check type for each fields in dataclass
     - `check_type` can be applied for nested dataclass, nested containers
 - No dependencies
+
+## Development
+
+- `make publish` to test and publish

@@ -1,4 +1,6 @@
 .PHONY: lint test exapmle publish test_all
+NPROCS = $(shell grep -c 'processor' /proc/cpuinfo)
+MAKEFLAGS += -j$(NPROCS)
 
 MODULE="dataclass_utils"
 lint:

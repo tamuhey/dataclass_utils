@@ -1,8 +1,11 @@
+import pytest
+import sys
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, Dict, List, Set
+from typing import Callable, Dict, List, Optional, Set
+from typing_extensions import TypedDict
 
-from dataclass_utils.type_checker import check, check_dataclass, is_error
+from dataclass_utils.type_checker import check, check_dataclass, is_error, is_typeddict
 
 
 def test_set():
@@ -82,3 +85,72 @@ class ENUM(Enum):
 def test_enum():
     assert is_error(check("a", ENUM))
     assert not is_error(check(ENUM.a, ENUM))
+
+
+class TD(TypedDict):
+    a: str
+    b: int
+    c: Optional["TD"]
+
+
+class TDPartial(TypedDict, total=False):
+    a: str
+    b: int
+    c: Optional["TDPartial"]
+
+
+class TDList(TypedDict):
+    a: int
+    b: List[TDPartial]
+
+
+@pytest.mark.parametrize(
+    "ty,value",
+    [
+        (TDList, {"a": 1, "b": [{"a": "1"}]}),
+        (TD, {"a": "foo", "b": 1, "c": None}),
+        (TDPartial, {"a": "foo"}),
+        (TDPartial, {}),
+        (TDPartial, {"c": {"c": {"c": {"c": {"c": {}}}}}}),
+        (
+            TD,
+            {
+                "a": "foo",
+                "b": 1,
+                "c": {"a": "bar", "b": 1, "c": {"a": "foo", "b": 2, "c": None}},
+            },
+        ),
+    ],
+)
+def test_typeddict(ty, value):
+    assert not is_error(check(value, ty))
+
+
+@pytest.mark.parametrize(
+    "ty,value",
+    [
+        (TD, {"a": "foo", "b": 1}),
+        (TD, {"a": 1}),
+        (TDPartial, {"c": {"c": {"c": {"c": {"c": {"a": 10}}}}}}),
+        (
+            TD,
+            {
+                "a": "foo",
+                "b": 1,
+                "c": {"a": "bar", "b": 1, "c": {"a": 1, "b": 2, "c": None}},
+            },
+        ),
+    ],
+)
+def test_typeddict_error(ty, value):
+    assert is_error(check(value, ty))
+
+
+if sys.version_info >= (3, 8, 0):
+    import typing
+
+    class XTD(typing.TypedDict):
+        a: int
+
+    def test_is_typeddict():
+        assert is_typeddict(XTD)

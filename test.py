@@ -3,7 +3,7 @@ from pathlib import Path
 from asyncio.subprocess import PIPE, Process
 import logging
 import pystructopt
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Union
 from typing_extensions import Literal, TypeGuard, get_args
 import logging
@@ -17,7 +17,9 @@ PYTHON_VERSIONS = set(get_args(T_PYTHON_VERSIONS))
 
 @dataclass
 class Opts:
-    python_version: Union[T_PYTHON_VERSIONS, Literal["all"]]
+    python_version: Union[T_PYTHON_VERSIONS, Literal["all"]] = field(
+        metadata={"positional": True}
+    )
     no_build: bool = False
 
 
@@ -47,10 +49,8 @@ async def run(python_version: T_PYTHON_VERSIONS, no_build: bool):
         if await proc.wait() != 0:
             raise ValueError(cmd)
 
-    test_cmd = f"docker run -it --rm {tag} make test"
-    proc = await asyncio.create_subprocess_exec(
-        *test_cmd.split(), stdout=PIPE, stderr=PIPE
-    )
+    test_cmd = f"docker run --rm {tag} make test"
+    proc = await asyncio.create_subprocess_exec(*test_cmd.split())
     if await proc.wait() != 0:
         raise ValueError(test_cmd)
 
