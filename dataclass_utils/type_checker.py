@@ -1,4 +1,3 @@
-import sys
 import dataclasses
 import typing
 from typing import (
@@ -14,12 +13,11 @@ from typing import (
     Union,
 )
 
-from typing_extensions import TypedDict, TypeGuard
 import typing_extensions
+from typing_extensions import TypedDict, TypeGuard
 
 from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
-
 
 Result = Optional[Error]  # returns error context
 
