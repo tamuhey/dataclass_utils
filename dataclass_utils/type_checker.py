@@ -13,10 +13,12 @@ from typing import (
     Union,
 )
 
-from typing_extensions import TypeGuard, TypedDict
-from .typing import _TypedDictMeta
+from typing_extensions import TypedDict, TypeGuard
+
 from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
+
+from .typing import _TypedDictMeta
 
 Result = Optional[Error]  # returns error context
 
