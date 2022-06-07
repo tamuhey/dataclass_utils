@@ -30,8 +30,8 @@ See [examples](./examples) directory for more examples.
 
 ## Features
 
-- Recursively check type for each fields in dataclass
-    - `check_type` can be applied for nested dataclass, nested containers
+- Recursively check type for each field in dataclass
+    - `check_type` can be applied for nested dataclasses, nested containers
 - No dependencies
 
 ## Development
