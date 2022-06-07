@@ -20,7 +20,7 @@ class Foo:
 
 import pytest
 
-check_type(Foo(1, ["b"])) # OK
+check_type(Foo(1, [[1])) # OK
 
 with pytest.raises(TypeError):
     check_type(Foo(1, [[2, "foo"]])) # NG
