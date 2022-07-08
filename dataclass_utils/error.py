@@ -24,12 +24,12 @@ class Error0(Error):
         self,
         ty: Type[Any],
         value: Any,
-        path: List[str] = [],
+        path: Optional[List[str]] = None,
         exception: Optional[Any] = None,
     ):
         self.ty = ty
         self.value = value
-        self.path = path
+        self.path = path or []
         self.exception = exception
 
     def __str__(self):
