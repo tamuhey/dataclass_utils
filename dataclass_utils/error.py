@@ -2,14 +2,14 @@ from typing import Any, List, Optional, Type
 
 
 class Error(TypeError):
-    def __init__(self, ty: Type[Any], value: Any, path: List[str] = []):
+    def __init__(self, ty: Type[Any], value: Any, path: Optional[List[str]] = None):
         if type(self) == Error:
             raise ValueError(
                 "Internal Error: `Error` must not be instantiated directly"
             )
         self.ty = ty
         self.value = value
-        self.path = path
+        self.path = path or []
 
     def __str__(self) -> str:
         raise NotImplementedError()
@@ -41,11 +41,13 @@ class Error0(Error):
 
 
 class MissingKeyError(Error):
-    def __init__(self, ty: Type[Any], value: Any, key: Any, path: List[str] = []):
+    def __init__(
+        self, ty: Type[Any], value: Any, key: Any, path: Optional[List[str]] = None
+    ):
         self.ty = ty
         self.key = key
         self.value = value
-        self.path = path
+        self.path = path or []
 
     def __str__(self):
         path = _path_to_str(self.path)
@@ -53,10 +55,10 @@ class MissingKeyError(Error):
 
 
 class UnsupportedTypeError(Error):
-    def __init__(self, ty: Type[Any], value: Any, path: List[str] = []):
+    def __init__(self, ty: Type[Any], value: Any, path: Optional[List[str]] = None):
         self.ty = ty
         self.value = value
-        self.path = path
+        self.path = path or []
 
     def __str__(self) -> str:
         path = _path_to_str(self.path)
