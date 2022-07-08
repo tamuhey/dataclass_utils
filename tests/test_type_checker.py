@@ -46,11 +46,6 @@ def test_error_dataclass():
     assert is_error(err)
     assert "c" in err.path
 
-    err = check_dataclass("foo", A)
-    assert is_error(err)
-    assert str(err)
-    assert "a" in err.path
-
 
 def test_error_dict_value():
     a = A(c=B(b={"foo": "bar"}))
