@@ -2,10 +2,15 @@ import pytest
 import sys
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, Dict, List, Optional, Set
+from typing import Callable, Dict, List, Optional, Set, Tuple
 from typing_extensions import TypedDict
 
 from dataclass_utils.type_checker import check, check_dataclass, is_error, is_typeddict
+
+
+def test_tuple():
+    assert not is_error(check((1, 2, 3), Tuple[int, ...]))
+    assert is_error(check((1, "b"), Tuple[int, ...]))
 
 
 def test_set():

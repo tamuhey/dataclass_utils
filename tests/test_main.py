@@ -225,3 +225,12 @@ class L:
 def test_union_dataclass():
     L(a="1")
     L(A(a=1, b=[]))
+
+
+@dataclasses.dataclass
+class M0:
+    xxx: Tuple[int, ...]
+
+
+def test_arbitrary_length_tuple():
+    check_type(M0(xxx=(1, 2, 3)))

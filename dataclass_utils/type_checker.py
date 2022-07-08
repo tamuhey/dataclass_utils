@@ -85,6 +85,14 @@ def check_literal(value: Any, ty: Type[Any]) -> Result:
 
 def check_tuple(value: Any, ty: Type[Tuple[Any, ...]]) -> Result:
     types = get_args(ty)
+    if len(types) == 2 and types[1] == ...:
+        # arbitrary length tuple (e.g. Tuple[int, ...])
+        for v in value:
+            err = check(v, types[0])
+            if is_error(err):
+                return err
+        return None
+
     if len(value) != len(types):
         return Error0(ty=ty, value=value)
     for v, t in zip(value, types):
