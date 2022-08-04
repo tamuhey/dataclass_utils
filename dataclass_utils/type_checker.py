@@ -1,4 +1,6 @@
 import dataclasses
+import sys
+import types
 import typing
 from typing import (
     Any,
@@ -20,6 +22,10 @@ from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
 
 Result = Optional[Error]  # returns error context
+
+
+def is_pep604_union(ty: Type[Any]) -> bool:
+    return sys.version_info >= (3, 10) and ty is types.UnionType
 
 
 def check(value: Any, ty: Type[Any]) -> Result:
@@ -55,12 +61,14 @@ def check(value: Any, ty: Type[Any]) -> Result:
                 err = check_tuple(value, ty)
             elif to is Literal:
                 err = check_literal(value, ty)
-            elif to is Union:
+            elif to is Union or is_pep604_union(to):
                 err = check_union(value, ty)
             return err
         elif isinstance(ty, type):
             # concrete type
-            if issubclass(ty, bool):
+            if is_pep604_union(ty):
+                pass
+            elif issubclass(ty, bool):
                 if not isinstance(value, ty):
                     return Error0(ty=ty, value=value)
             elif issubclass(ty, int):  # For boolean
