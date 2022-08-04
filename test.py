@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-T_PYTHON_VERSIONS = Literal["3.7", "3.8", "3.9", "3.10-rc"]
+T_PYTHON_VERSIONS = Literal["3.7", "3.8", "3.9", "3.10"]
 PYTHON_VERSIONS = set(get_args(T_PYTHON_VERSIONS))
 
 

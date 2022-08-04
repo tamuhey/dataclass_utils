@@ -25,7 +25,7 @@ Result = Optional[Error]  # returns error context
 
 
 def is_pep604_union(ty: Type[Any]) -> bool:
-    return sys.version_info >= (3, 10) and ty is types.UnionType
+    return sys.version_info >= (3, 10) and ty is types.UnionType  # type: ignore
 
 
 def check(value: Any, ty: Type[Any]) -> Result:
