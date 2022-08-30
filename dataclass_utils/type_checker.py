@@ -1,7 +1,6 @@
 import dataclasses
-import sys
-import types
 import typing
+from dataclass_utils._internal.shared import is_pep604_union
 from typing import (
     Any,
     Dict,
@@ -22,10 +21,6 @@ from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
 
 Result = Optional[Error]  # returns error context
-
-
-def is_pep604_union(ty: Type[Any]) -> bool:
-    return sys.version_info >= (3, 10) and ty is types.UnionType  # type: ignore
 
 
 def check(value: Any, ty: Type[Any]) -> Result:

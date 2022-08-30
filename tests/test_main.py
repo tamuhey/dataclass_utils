@@ -2,7 +2,6 @@ import dataclasses
 from enum import Enum
 from typing import (
     Any,
-    AnyStr,
     Callable,
     ClassVar,
     Dict,
@@ -12,7 +11,6 @@ from typing import (
     Set,
     Tuple,
     Type,
-    TypeVar,
     Union,
 )
 
