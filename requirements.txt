@@ -1,0 +1,2 @@
+typing-extensions
+pytest==7.0
