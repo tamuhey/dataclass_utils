@@ -1,10 +1,10 @@
 """Convert dict into dataclass"""
 
-from dataclass_utils._internal.shared import is_pep604_union
 import dataclasses
 import logging
 from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
 
+from dataclass_utils._internal.shared import is_pep604_union
 from dataclass_utils.error import Error, Error0, MissingKeyError
 from dataclass_utils.typing import Literal, get_args, get_origin
 

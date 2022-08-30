@@ -1,6 +1,5 @@
 import dataclasses
 import typing
-from dataclass_utils._internal.shared import is_pep604_union
 from typing import (
     Any,
     Dict,
@@ -17,6 +16,7 @@ from typing import (
 import typing_extensions
 from typing_extensions import TypedDict, TypeGuard
 
+from dataclass_utils._internal.shared import is_pep604_union
 from dataclass_utils.error import Error, Error0
 from dataclass_utils.typing import Literal, get_args, get_origin
 
