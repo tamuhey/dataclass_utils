@@ -1,5 +1,6 @@
 """Convert dict into dataclass"""
 
+from dataclass_utils._internal.shared import is_pep604_union
 import dataclasses
 import logging
 from typing import Any, Dict, Iterable, List, Sized, Type, TypeVar, Union, cast
@@ -39,7 +40,7 @@ def into(value: V, kls: Type[T]) -> Result[T]:
                 ret = _into_dict(value, kls)
             elif to is tuple:
                 ret = _into_tuple(value, kls)
-            elif to is Union:
+            elif to is Union or is_pep604_union(to):
                 ret = _into_union(value, kls)
             elif to is Literal:
                 ret = _into_literal(value, kls)
@@ -51,13 +52,13 @@ def into(value: V, kls: Type[T]) -> Result[T]:
                 ret = Error0(kls, value)
             return ret
         elif type(kls) == TypeVar:
-            logger.warning(
-                "Since TypeVar is not supported, the type is assumed to be `Type`"
-            )
+            logger.warning("Since `TypeVar` is not supported, skip the type check")
             return value  # type: ignore
         elif kls is None:
             if value is None:
                 return value
+        elif is_pep604_union(kls):
+            pass
         else:
             try:
                 if isinstance(value, kls):
